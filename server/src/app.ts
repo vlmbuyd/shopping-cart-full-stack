@@ -1,15 +1,15 @@
 import express from 'express';
 import ProductManager from './ProductManager.js';
 import Cart from './Cart.js';
-import AppService from './AppService.js';
+import AppService, { registerProduct } from './AppService.js';
 import { errorHandler } from './errorHandler.js';
+
+const app = express();
 
 // productManager, cart 인스턴스를 테스트에서 사용하기 위해서 export한다.
 export const productManager = new ProductManager();
 export const cart = new Cart();
 const appService = new AppService(productManager, cart);
-
-const app = express();
 
 app.use(express.json());
 
@@ -22,7 +22,8 @@ app.post('/products', (req, res) => {
   try {
     const { name, price, imgUrl, quantity } = req.body;
 
-    const id = productManager.addProduct({ name, price, imgUrl, quantity });
+    // const id = productManager.addProduct({ name, price, imgUrl, quantity });
+    const id = registerProduct({ name, price, imgUrl, quantity });
 
     res.status(201).json({
       code: 201,
