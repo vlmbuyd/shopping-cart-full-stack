@@ -50,9 +50,9 @@ app.post('/products', (req, res) => {
 });
 
 // 상품 삭제
-app.delete('/products/:id', (req, res) => {
+app.delete('/products/:productId', (req, res) => {
   try {
-    const productId = req.params.id;
+    const productId = req.params.productId;
 
     appService.deleteProduct(Number(productId));
 
@@ -96,11 +96,11 @@ app.post('/carts', (req, res) => {
 });
 
 // 장바구니 상품 삭제
-app.delete('/carts/:id', (req, res) => {
+app.delete('/carts/:cartItemId', (req, res) => {
   try {
-    const productId = req.params.id;
+    const cartItemId = req.params.cartItemId;
 
-    appService.deleteCartItem(Number(productId));
+    appService.deleteCartItem(Number(cartItemId));
 
     res.status(204).json();
   } catch (error) {
@@ -110,17 +110,17 @@ app.delete('/carts/:id', (req, res) => {
 });
 
 // 장바구니 상품 수량 변경
-app.patch('/carts/:id', (req, res) => {
+app.patch('/carts/:cartItemId', (req, res) => {
   try {
-    const productId = Number(req.params.id);
+    const cartItemId = Number(req.params.cartItemId);
     const { orderCount } = req.body;
 
-    appService.updateCartItem({ id: productId, orderCount });
+    appService.updateCartItem({ id: cartItemId, orderCount });
 
     res.status(200).json({
       message: '성공적으로 수량이 변경되었습니다.',
       result: {
-        id: productId,
+        id: cartItemId,
         orderCount: orderCount,
       },
     });
