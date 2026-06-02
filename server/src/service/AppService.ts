@@ -19,6 +19,7 @@ export default class AppSerivce {
 
   deleteProduct(id: number) {
     this.productService.deleteProduct(id);
+    this.cartService.deleteCartItemIfExist(id);
   }
 
   getCartItems() {

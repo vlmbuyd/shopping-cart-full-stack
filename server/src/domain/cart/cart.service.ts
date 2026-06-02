@@ -20,6 +20,7 @@ export default class CartService {
     this.cartRepository.update(id, orderCount);
   }
 
+  // 사용자 직접 제거 요청
   deleteCartItem(id: number) {
     const exists = this.cartRepository
       .get()
@@ -27,5 +28,13 @@ export default class CartService {
     if (!exists) throw new AppError('PRODUCT_NOT_EXIST_IN_CART');
 
     this.cartRepository.delete(id);
+  }
+
+  // 상품 제거로 인한 부수효과
+  deleteCartItemIfExist(id: number) {
+    const cartItems = this.getCartItems();
+    const target = cartItems.find((item) => item.toJson().id === id);
+
+    if (target) this.cartRepository.delete(id);
   }
 }

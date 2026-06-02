@@ -6,7 +6,6 @@ import { InMemoryProductRepository } from './domain/product/product.repository.j
 import CartService from './domain/cart/cart.service.js';
 import { InMemoryCartRepository } from './domain/cart/cart.repository.js';
 
-// export const cart = new Cart();
 const inMemoryProductRepository = new InMemoryProductRepository();
 const inMemoryCartRepository = new InMemoryCartRepository();
 const productService = new ProductService(inMemoryProductRepository);
