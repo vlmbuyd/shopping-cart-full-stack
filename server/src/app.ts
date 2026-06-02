@@ -23,7 +23,6 @@ app.get('/products', (_, res) => {
     const products = appService.getProducts();
 
     res.status(200).json({
-      code: 200,
       message: '요청에 성공했습니다.',
       result: { products },
     });
@@ -41,7 +40,6 @@ app.post('/products', (req, res) => {
     const id = appService.addProduct({ name, price, imgUrl, quantity });
 
     res.status(201).json({
-      code: 201,
       message: '성공적으로 생성되었습니다.',
       result: { id },
     });
@@ -71,7 +69,6 @@ app.get('/carts', (_, res) => {
     const cartItems = appService.getCartItems();
 
     res.status(200).json({
-      code: 200,
       message: '요청에 성공했습니다.',
       result: { cartItems },
     });
@@ -89,7 +86,6 @@ app.post('/carts', (req, res) => {
     const cartItemId = appService.addCartItem({ id, orderCount });
 
     res.status(201).json({
-      code: 201,
       message: '성공적으로 생성되었습니다.',
       result: { id: cartItemId },
     });
@@ -122,7 +118,6 @@ app.patch('/carts/:id', (req, res) => {
     appService.updateCartItem({ id: productId, orderCount });
 
     res.status(200).json({
-      code: 200,
       message: '성공적으로 수량이 변경되었습니다.',
       result: {
         id: productId,

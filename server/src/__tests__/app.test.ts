@@ -21,7 +21,6 @@ describe('GET /products API 테스트', () => {
     // then
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      code: 200,
       message: '요청에 성공했습니다.',
       result: { products: [] },
     });
@@ -78,7 +77,6 @@ describe('POST /products API 테스트', () => {
     // then
     expect(response.status).toBe(201);
     expect(response.body).toEqual({
-      code: 201,
       message: '성공적으로 생성되었습니다.',
       result: { id: expect.any(Number) },
     });
@@ -298,7 +296,6 @@ describe('GET /carts API 테스트', () => {
     // then
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      code: 200,
       message: '요청에 성공했습니다.',
       result: { cartItems: [] },
     });
@@ -334,7 +331,6 @@ describe('POST /carts API 테스트', () => {
     // then
     expect(response.status).toBe(201);
     expect(response.body).toEqual({
-      code: 201,
       message: '성공적으로 생성되었습니다.',
       result: { id: expect.any(Number) },
     });
@@ -436,7 +432,6 @@ describe('PATCH /carts/:id API 테스트', () => {
     // then
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      code: 200,
       message: '성공적으로 수량이 변경되었습니다.',
       result: { id: productId, orderCount: newOrderCount },
     });

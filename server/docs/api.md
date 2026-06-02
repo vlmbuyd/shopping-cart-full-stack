@@ -28,7 +28,6 @@
 
 ```json
 {
-  "code": 200,
   "message": "요청에 성공했습니다.",
   "result": {
     "products": [
@@ -73,7 +72,6 @@
 
 ```json
 {
-  "code": 201,
   "message": "성공적으로 생성되었습니다.",
   "result": {
     "id": 1
@@ -162,7 +160,6 @@
 
 ```json
 {
-  "code": 200,
   "message": "요청에 성공했습니다.",
   "result": {
     "cartItems": [
@@ -190,12 +187,13 @@
 ### 2. 장바구니 상품 추가
 
 - **Method**: `POST`
-- **Path**: `/carts/{id}`
+- **Path**: `/carts`
 
 **Request Body**
 
 ```json
 {
+  "id": 1,
   "orderCount": 2
 }
 ```
@@ -204,7 +202,6 @@
 
 ```json
 {
-  "code": 201,
   "message": "성공적으로 생성되었습니다.",
   "result": {
     "id": 1
@@ -263,7 +260,6 @@
 
 ```json
 {
-  "code": 200,
   "message": "성공적으로 수량이 변경되었습니다.",
   "result": {
     "id": 1,
