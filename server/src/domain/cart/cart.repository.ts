@@ -2,14 +2,14 @@ import { cartItems } from '../../db/inMemoryDb.js';
 import CartItem from '../../model/CartItem.js';
 
 export interface CartRepository {
-  get: () => CartItem[];
+  findAll: () => CartItem[];
   add: (cartItem: CartItem) => void;
   update: (id: number, orderCount: number) => void;
   delete: (id: number) => void;
 }
 
 export class InMemoryCartRepository implements CartRepository {
-  get() {
+  findAll() {
     return [...cartItems];
   }
 

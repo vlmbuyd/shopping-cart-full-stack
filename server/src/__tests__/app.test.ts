@@ -246,7 +246,7 @@ describe('DELETE /products/:id API 테스트', () => {
     expect(response.status).toBe(404);
     expect(response.body).toEqual({
       code: 'PRODUCT_NOT_EXIST',
-      message: '삭제하려는 상품이 존재하지 않습니다.',
+      message: '상품이 존재하지 않습니다.',
     });
   });
 
@@ -414,18 +414,23 @@ describe('DELETE /carts/:id API 테스트', () => {
 });
 
 describe('PATCH /carts/:id API 테스트', () => {
-  beforeEach(() => {
+  let productId: number;
+
+  beforeEach(async () => {
+    products.length = 0;
     cartItems.length = 0;
+    const postResponse = await request(app).post('/products').send(mockProduct);
+    productId = postResponse.body.result.id;
+    await request(app).post('/carts').send({ id: productId, orderCount: 1 });
   });
 
   test('정상적인 수량 변경 요청 시 200과 변경된 수량 정보를 응답한다.', async () => {
     // given
-    await request(app).post('/carts').send(mockCartItem);
-    const newOrderCount = 5;
+    const newOrderCount = mockProduct.quantity;
 
     // when
     const response = await request(app)
-      .patch(`/carts/${mockCartItem.id}`)
+      .patch(`/carts/${productId}`)
       .send({ orderCount: newOrderCount });
 
     // then
@@ -433,17 +438,28 @@ describe('PATCH /carts/:id API 테스트', () => {
     expect(response.body).toEqual({
       code: 200,
       message: '성공적으로 수량이 변경되었습니다.',
-      result: { id: mockCartItem.id, orderCount: newOrderCount },
+      result: { id: productId, orderCount: newOrderCount },
+    });
+  });
+
+  test('상품 재고보다 많은 수량으로 변경 시 400과 PRODUCT_ORDER_COUNT_EXCEEDED 코드를 응답한다.', async () => {
+    // when
+    const response = await request(app)
+      .patch(`/carts/${productId}`)
+      .send({ orderCount: mockProduct.quantity + 1 });
+
+    // then
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      code: 'PRODUCT_ORDER_COUNT_EXCEEDED',
+      message: '보유한 상품의 개수를 넘어섰습니다.',
     });
   });
 
   test('orderCount 필드가 누락되면 400과 EMPTY_PRODUCT_ORDER_COUNT 코드를 응답한다.', async () => {
-    // given
-    await request(app).post('/carts').send(mockCartItem);
-
     // when
     const response = await request(app)
-      .patch(`/carts/${mockCartItem.id}`)
+      .patch(`/carts/${productId}`)
       .send({});
 
     // then
@@ -455,12 +471,9 @@ describe('PATCH /carts/:id API 테스트', () => {
   });
 
   test('orderCount가 0 이하이면 400과 INVALID_PRODUCT_ORDER_COUNT_TYPE 코드를 응답한다.', async () => {
-    // given
-    await request(app).post('/carts').send(mockCartItem);
-
     // when
     const response = await request(app)
-      .patch(`/carts/${mockCartItem.id}`)
+      .patch(`/carts/${productId}`)
       .send({ orderCount: 0 });
 
     // then

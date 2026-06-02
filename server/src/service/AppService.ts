@@ -1,5 +1,6 @@
 import CartService from '../domain/cart/cart.service.js';
 import ProductService from '../domain/product/product.service.js';
+import AppError from '../errors/AppError.js';
 import { CartItemType } from '../model/CartItem.js';
 import { ProductType } from '../model/Product.js';
 
@@ -31,6 +32,11 @@ export default class AppSerivce {
   }
 
   updateCartItem({ id, orderCount }: CartItemType) {
+    const product = this.productService.getProductById(id);
+    if (product.toJson().quantity < orderCount) {
+      throw new AppError('PRODUCT_ORDER_COUNT_EXCEEDED');
+    }
+
     this.cartService.updateCartItem({ id, orderCount });
   }
 

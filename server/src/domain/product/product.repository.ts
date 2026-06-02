@@ -2,15 +2,24 @@ import { products } from '../../db/inMemoryDb.js';
 import Product from '../../model/Product.js';
 
 export interface ProductRepository {
-  get: () => Product[];
+  findAll: () => Product[];
+  findById: (id: number) => Product;
   add: (product: Product) => void;
   delete: (id: number) => void;
   nextId: () => number;
 }
 
 export class InMemoryProductRepository implements ProductRepository {
-  get() {
+  findAll() {
     return [...products];
+  }
+
+  findById(id: number) {
+    const target = products.find((product) => product.toJson().id === id);
+
+    if (!target) throw new Error('PRODUCT_NOT_EXIST');
+
+    return target;
   }
 
   add(product: Product) {

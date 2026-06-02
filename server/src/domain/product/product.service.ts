@@ -6,7 +6,11 @@ class ProductService {
   constructor(private productRepository: ProductRepository) {}
 
   getProducts() {
-    return this.productRepository.get();
+    return this.productRepository.findAll();
+  }
+
+  getProductById(id: number) {
+    return this.productRepository.findById(id);
   }
 
   addProduct({ name, price, quantity, imgUrl }: Omit<ProductType, 'id'>) {
@@ -19,7 +23,7 @@ class ProductService {
 
   deleteProduct(id: number) {
     const exists = this.productRepository
-      .get()
+      .findAll()
       .some((p: Product) => p.toJson().id === id);
     if (!exists) throw new AppError('PRODUCT_NOT_EXIST');
 

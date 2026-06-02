@@ -32,7 +32,7 @@ export const ERROR_CODE = {
   PRODUCT_NOT_EXIST: {
     code: 'PRODUCT_NOT_EXIST',
     status: 404,
-    message: '삭제하려는 상품이 존재하지 않습니다.',
+    message: '상품이 존재하지 않습니다.',
   },
   INVALID_PRODUCT_ORDER_COUNT_TYPE: {
     code: 'INVALID_PRODUCT_ORDER_COUNT_TYPE',

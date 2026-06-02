@@ -6,7 +6,7 @@ export default class CartService {
   constructor(private cartRepository: CartRepository) {}
 
   getCartItems() {
-    return this.cartRepository.get();
+    return this.cartRepository.findAll();
   }
 
   addCartItem({ id, orderCount }: CartItemType) {
@@ -23,7 +23,7 @@ export default class CartService {
   // 사용자 직접 제거 요청
   deleteCartItem(id: number) {
     const exists = this.cartRepository
-      .get()
+      .findAll()
       .some((c: CartItem) => c.toJson().id === id);
     if (!exists) throw new AppError('PRODUCT_NOT_EXIST_IN_CART');
 
