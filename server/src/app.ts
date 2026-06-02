@@ -2,19 +2,34 @@ import express from 'express';
 import AppService from './service/AppService.js';
 import { errorHandler } from './errors/errorHandler.js';
 import ProductService from './domain/product/product.service.js';
-import { InMemoryProductRepository } from './domain/product/product.repository.js';
+import {
+  InMemoryProductRepository,
+  ProductRepository,
+} from './domain/product/product.repository.js';
 import CartService from './domain/cart/cart.service.js';
-import { InMemoryCartRepository } from './domain/cart/cart.repository.js';
+import {
+  CartRepository,
+  InMemoryCartRepository,
+} from './domain/cart/cart.repository.js';
 
-const inMemoryProductRepository = new InMemoryProductRepository();
-const inMemoryCartRepository = new InMemoryCartRepository();
-const productService = new ProductService(inMemoryProductRepository);
-const cartService = new CartService(inMemoryCartRepository);
+function createAppService(
+  productRepo: ProductRepository,
+  cartRepo: CartRepository,
+) {
+  const productService = new ProductService(productRepo);
+  const cartService = new CartService(cartRepo);
 
-const appService = new AppService(productService, cartService);
+  const appService = new AppService(productService, cartService);
+
+  return appService;
+}
+
+const appService = createAppService(
+  new InMemoryProductRepository(),
+  new InMemoryCartRepository(),
+);
 
 const app = express();
-
 app.use(express.json());
 
 // 상품 조회
