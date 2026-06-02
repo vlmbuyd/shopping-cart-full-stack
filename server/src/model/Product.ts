@@ -45,7 +45,7 @@ class Product {
     if (!price && price !== 0) {
       throw new AppError('EMPTY_PRODUCT_PRICE');
     }
-    if (price <= 0 || typeof price === 'string') {
+    if (price <= 0 || typeof price !== 'number') {
       throw new AppError('INVALID_PRODUCT_PRICE_TYPE');
     }
   }
