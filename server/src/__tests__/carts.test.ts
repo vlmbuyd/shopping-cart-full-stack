@@ -1,115 +1,46 @@
 import AppError from '../errors/AppError.js';
-import Cart from '../model/Cart.js';
+import CartItem from '../model/CartItem.js';
 
-describe('장바구니 상품 수량 변경 기능 테스트', () => {
-  test('상품 1개를 추가하면, 해당 상품의 주문 수량이 1 증가한다.', () => {
-    // given
-    const cart = new Cart();
-    const productId = 1;
+describe('CartItem 생성 기능 테스트', () => {
+  test('유효한 정보로 생성하면 toJson()이 해당 정보를 반환한다.', () => {
+    const cartItem = new CartItem(1, 3);
 
-    // when
-    cart.addCartItem(productId, 1);
-    cart.setOrderCount(productId, 2);
-
-    // then
-    expect(cart.getOrderCount(productId)).toBe(2);
-  });
-
-  test('상품 1개를 줄이면, 해당 상품의 주문 수량이 1 감소한다.', () => {
-    // given
-    const cart = new Cart();
-    const productId = 1;
-
-    // when
-    cart.addCartItem(productId, 2);
-    cart.setOrderCount(productId, 1);
-
-    // then
-    expect(cart.getOrderCount(productId)).toBe(1);
+    expect(cartItem.toJson()).toEqual({ id: 1, orderCount: 3 });
   });
 });
 
-describe('장바구니 상품 수량 변경 예외 테스트', () => {
-  test('상품 수량이 1 이상의 정수가 아닐때 에러를 발생시킨다.', () => {
-    // given
-    const cart = new Cart();
-
-    const productId = 1;
-    cart.addCartItem(productId, 1);
-
-    // when & then
+describe('CartItem 주문 수량 검증 테스트', () => {
+  test('주문 수량이 1 미만이면 에러를 발생시킨다.', () => {
     expect(() => {
-      // @ts-ignore 예외 처리를 위한 타입 무시
-      cart.setOrderCount(productId, 'abc');
-    }).toThrow(new AppError('INVALID_PRODUCT_ORDER_COUNT_TYPE'));
-
-    expect(() => {
-      // @ts-ignore 예외 처리를 위한 타입 무시
-      cart.setOrderCount(productId, '2');
+      new CartItem(1, 0);
     }).toThrow(new AppError('INVALID_PRODUCT_ORDER_COUNT_TYPE'));
   });
 
-  test('장바구니에 존재하지 않는 상품의 수량을 변경하면 에러를 발생시킨다.', () => {
-    // given
-    const cart = new Cart();
-    const wrongProductId = 999;
-
-    // when & then
+  test('주문 수량이 문자열이면 에러를 발생시킨다.', () => {
     expect(() => {
-      // @ts-ignore 예외 처리를 위한 타입 무시
-      cart.setOrderCount(wrongProductId, 2);
-    }).toThrow(new AppError('PRODUCT_NOT_EXIST_FOR_ORDER'));
+      // @ts-ignore
+      new CartItem(1, '3');
+    }).toThrow(new AppError('INVALID_PRODUCT_ORDER_COUNT_TYPE'));
   });
 
-  test('필수 필드 누락 시 에러를 응답한다.', () => {
-    // given
-    const cart = new Cart();
-    const productId = 1;
-
-    cart.addCartItem(productId, 1);
-
-    // when & then
+  test('주문 수량이 빈 문자열이면 에러를 발생시킨다.', () => {
     expect(() => {
-      // @ts-ignore 예외 처리를 위한 타입 무시
-      cart.setOrderCount(productId, '');
-    }).toThrow(new AppError('EMPTY_PRODUCT_ORDER_COUNT'));
-
-    expect(() => {
-      // @ts-ignore 예외 처리를 위한 타입 무시
-      cart.setOrderCount(productId, null);
-    }).toThrow(new AppError('EMPTY_PRODUCT_ORDER_COUNT'));
-
-    expect(() => {
-      // @ts-ignore 예외 처리를 위한 타입 무시
-      cart.setOrderCount(productId, undefined);
+      // @ts-ignore
+      new CartItem(1, '');
     }).toThrow(new AppError('EMPTY_PRODUCT_ORDER_COUNT'));
   });
-});
 
-describe('장바구니 상품 삭제 기능 테스트', () => {
-  test('장바구니에 담긴 상품을 삭제하면, 해당 상품이 장바구니 상품 목록에서 삭제된다.', () => {
-    // given
-    const cart = new Cart();
-    const productId = 1;
-    cart.addCartItem(productId, 1);
-
-    // when
-    cart.deleteCartItem(productId);
-
-    // then
-    expect(cart.getOrderCount(productId)).toBe(undefined);
-  });
-});
-
-describe('장바구니 상품 삭제 예외 테스트', () => {
-  test('장바구니에 존재하지 않는 상품을 제거했을 때 에러를 발생시킨다.', () => {
-    // given
-    const cart = new Cart();
-    const wrongProductId = 999;
-
-    // when & then
+  test('주문 수량이 null이면 에러를 발생시킨다.', () => {
     expect(() => {
-      cart.deleteCartItem(wrongProductId);
-    }).toThrow(new AppError('PRODUCT_NOT_EXIST_IN_CART'));
+      // @ts-ignore
+      new CartItem(1, null);
+    }).toThrow(new AppError('EMPTY_PRODUCT_ORDER_COUNT'));
+  });
+
+  test('주문 수량이 undefined이면 에러를 발생시킨다.', () => {
+    expect(() => {
+      // @ts-ignore
+      new CartItem(1, undefined);
+    }).toThrow(new AppError('EMPTY_PRODUCT_ORDER_COUNT'));
   });
 });
