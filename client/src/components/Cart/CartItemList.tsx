@@ -19,6 +19,34 @@ const mockProducts: Product[] = [
     imgUrl: 'https://picsum.photos/200/200',
     quantity: 2,
   },
+  {
+    id: 2,
+    name: '상품이름B',
+    price: 25000,
+    imgUrl: 'https://picsum.photos/200/200',
+    quantity: 2,
+  },
+  {
+    id: 2,
+    name: '상품이름B',
+    price: 25000,
+    imgUrl: 'https://picsum.photos/200/200',
+    quantity: 2,
+  },
+  {
+    id: 2,
+    name: '상품이름B',
+    price: 25000,
+    imgUrl: 'https://picsum.photos/200/200',
+    quantity: 2,
+  },
+  {
+    id: 2,
+    name: '상품이름B',
+    price: 25000,
+    imgUrl: 'https://picsum.photos/200/200',
+    quantity: 2,
+  },
 ];
 
 export default function CartItemList() {
@@ -46,4 +74,6 @@ export default function CartItemList() {
   );
 }
 
-const Container = styled.div``;
+const Container = styled.div`
+margin-bottom: 52px;
+`;
