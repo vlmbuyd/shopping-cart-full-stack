@@ -3,25 +3,23 @@ import styled from '@emotion/styled';
 import CheckBox from '../CheckBox/CheckBox';
 
 interface Props {
-  children: ReactNode;
+  isSelected: boolean;
   onSelect: (isSelected: boolean) => void;
   onDelete: () => void;
+  children: ReactNode;
 }
 
-export default function CartItem({ children, onSelect, onDelete }: Props) {
-  const handleSelected = (isSelected: boolean) => {
-    onSelect(isSelected);
-  };
-
-  const handleDelete = () => {
-    onDelete();
-  };
-
+export default function CartItem({
+  isSelected,
+  onSelect,
+  onDelete,
+  children,
+}: Props) {
   return (
     <Container>
       <Controls>
-        <CheckBox onClick={handleSelected} />
-        <DeleteButton type="button" onClick={handleDelete}>
+        <CheckBox isSelected={isSelected} onSelect={onSelect} />
+        <DeleteButton type="button" onClick={onDelete}>
           삭제
         </DeleteButton>
       </Controls>

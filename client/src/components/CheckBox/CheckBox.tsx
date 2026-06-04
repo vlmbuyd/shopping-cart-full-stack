@@ -1,21 +1,16 @@
-import { useState } from 'react';
 import styled from '@emotion/styled';
 import checkIcon from '../../assets/check.svg';
 import unCheckIcon from '../../assets/uncheck.svg';
 
 export default function CheckBox({
-  onClick,
+  isSelected,
+  onSelect,
 }: {
-  onClick: (isSelected: boolean) => void;
+  isSelected: boolean;
+  onSelect: (isSelected: boolean) => void;
 }) {
-  const [isSelected, setIsSelected] = useState(true);
-
-  const handleClick = () => {
-    const next = !isSelected;
-    setIsSelected(next);
-    onClick(next);
-  };
-
+  const handleClick = () => onSelect(!isSelected);
+  
   return (
     <Container $isSelected={isSelected} onClick={handleClick}>
       <IconWrapper $isSelected={isSelected}>

@@ -17,6 +17,7 @@ const Container = styled.div`
   gap: 12px;
   width: 100%;
   height: 62px;
+  margin-bottom: 36px;
 `;
 
 const Header = styled.div``;

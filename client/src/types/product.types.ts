@@ -5,12 +5,12 @@ interface ProductBase {
   imgUrl: string;
 }
 
-interface Product extends ProductBase {
+interface ProductType extends ProductBase {
   quantity: number;
 }
 
-interface CartItem extends ProductBase {
+interface CartItemType extends ProductBase {
   orderCount: number;
 }
 
-export type { Product, CartItem };
+export type { ProductType, CartItemType };

@@ -1,63 +1,42 @@
 import styled from '@emotion/styled';
-import type { Product } from '../Product/product.types';
-import CartItem from './CartItem';
 import ProductCard from '../Product/ProductCard';
 import QuantityStepper from './QuantityStepper';
+import CheckBox from '../CheckBox/CheckBox';
+import CartItem from './CartItem';
+import type { CartItemType } from '../../types/product.types';
 
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: '상품이름A',
-    price: 35000,
-    imgUrl: 'https://picsum.photos/200/200',
-    quantity: 3,
-  },
-  {
-    id: 2,
-    name: '상품이름B',
-    price: 25000,
-    imgUrl: 'https://picsum.photos/200/200',
-    quantity: 2,
-  },
-  {
-    id: 2,
-    name: '상품이름B',
-    price: 25000,
-    imgUrl: 'https://picsum.photos/200/200',
-    quantity: 2,
-  },
-  {
-    id: 2,
-    name: '상품이름B',
-    price: 25000,
-    imgUrl: 'https://picsum.photos/200/200',
-    quantity: 2,
-  },
-  {
-    id: 2,
-    name: '상품이름B',
-    price: 25000,
-    imgUrl: 'https://picsum.photos/200/200',
-    quantity: 2,
-  },
-  {
-    id: 2,
-    name: '상품이름B',
-    price: 25000,
-    imgUrl: 'https://picsum.photos/200/200',
-    quantity: 2,
-  },
-];
+interface Props {
+  cartItems: CartItemType[];
+  selectedIds: Set<number>;
+  onSelect: (id: number, isSelected: boolean) => void;
+  onSelectAll: () => void;
+  onDelete: () => void;
+}
 
-export default function CartItemList() {
-  const handleSelect = (isSelected: boolean) => {};
-
-  const handleDelete = () => {};
-
+export default function CartItemList({
+  cartItems,
+  selectedIds,
+  onSelect,
+  onSelectAll,
+  onDelete,
+}: Props) {
   return (
     <Container>
-      {mockProducts.map((product) => (
-        <CartItem onSelect={handleSelect} onDelete={handleDelete}>
+      <SelectAll>
+        <CheckBox
+          isSelected={cartItems.length === selectedIds.size}
+          onSelect={onSelectAll}
+        />
+        <span>전체선택</span>
+      </SelectAll>
+
+      {cartItems.map((product) => (
+        <CartItem
+          key={product.id}
+          isSelected={selectedIds.has(product.id)}
+          onSelect={(isSelected) => onSelect(product.id, isSelected)}
+          onDelete={onDelete}
+        >
           <ProductCard
             data={product}
             action={
@@ -75,5 +54,20 @@ export default function CartItemList() {
 }
 
 const Container = styled.div`
-margin-bottom: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 52px;
+`;
+
+const SelectAll = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  span {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0a0d13;
+  }
 `;

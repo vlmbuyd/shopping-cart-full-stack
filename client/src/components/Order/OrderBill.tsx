@@ -62,7 +62,7 @@ const OrderDetails = styled.div`
   border-top: 1px solid #0000001a;
 `;
 
-const PriceRow = styled.p`
+const PriceRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;

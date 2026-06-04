@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
-import type { Product } from './product.types';
 import { formatPrice } from '../../utils/formatPrice';
 import type { ReactNode } from 'react';
+import type { CartItemType } from '../../types/product.types';
 
 interface Props {
-  data: Product;
+  data: CartItemType;
   action: ReactNode;
 }
 
