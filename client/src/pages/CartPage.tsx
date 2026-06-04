@@ -3,7 +3,8 @@ import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
 import OrderBill from '../components/Order/OrderBill';
 import type { CartItemType } from '../types/product.types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { saveSelectedIds } from '../utils/cartStorage';
 
 const mockProducts: CartItemType[] = [
   {
@@ -25,32 +26,33 @@ const mockProducts: CartItemType[] = [
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItemType[]>(mockProducts);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(() => {
-    const set = new Set<number>();
-    cartItems.forEach((item) => {
-      set.add(item.id);
-    });
-    return set;
+    const saved = localStorage.getItem('selectedCartIds');
+    if (saved) return new Set(JSON.parse(saved));
+
+    return new Set(cartItems.map((item) => item.id));
   });
 
   const handleSelect = (id: number, isSelected: boolean) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-
       if (isSelected) next.add(id);
       else next.delete(id);
 
+      saveSelectedIds([...next]);
       return next;
     });
   };
 
   const handleSelectAll = () => {
     setSelectedIds(() => {
-      const set = new Set<number>();
+      const next = new Set<number>();
       cartItems.forEach((item) => {
-        if (selectedIds.size === 0) set.add(item.id);
-        else set.delete(item.id);
+        if (selectedIds.size === 0) next.add(item.id);
+        else next.delete(item.id);
       });
-      return set;
+
+      saveSelectedIds([...next]);
+      return next;
     });
   };
 
