@@ -13,7 +13,7 @@ const Container = styled.header`
   align-items: center;
   padding-left: 24px;
   width: 100%;
-  height: 64px;
+  min-height: 64px;
   background-color: #000000;
 `;
 

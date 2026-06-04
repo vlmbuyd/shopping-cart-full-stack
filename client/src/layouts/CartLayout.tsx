@@ -14,7 +14,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: calc(100% - 64px);
+  height: calc(100% - 128px);
   padding: 36px 24px 64px 24px;
   overflow: auto;
 `;
