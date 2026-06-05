@@ -2,7 +2,15 @@ import styled from '@emotion/styled';
 import infoIcon from '../../assets/info.svg';
 import { formatPrice } from '../../utils/formatPrice';
 
-export default function OrderBill() {
+interface Props {
+  orderBill: {
+    orderPrice: number;
+    shippingFee: number;
+    totalPrice: number;
+  };
+}
+
+export default function OrderBill({ orderBill }: Props) {
   return (
     <Container>
       <ShippingFeeInfo>
@@ -15,18 +23,18 @@ export default function OrderBill() {
       <OrderDetails>
         <OrderPrice>
           <p>주문 금액</p>
-          <strong>{formatPrice(80000)}원</strong>
+          <strong>{formatPrice(orderBill.orderPrice)}원</strong>
         </OrderPrice>
         <ShippingFee>
           <p>배송비</p>
-          <strong>{formatPrice(3000)}원</strong>
+          <strong>{formatPrice(orderBill.shippingFee)}원</strong>
         </ShippingFee>
       </OrderDetails>
 
       <OrderDetails>
         <TotalPrice>
           <p>총 결제 금액</p>
-          <strong>{formatPrice(120000)}원</strong>
+          <strong>{formatPrice(orderBill.totalPrice)}원</strong>
         </TotalPrice>
       </OrderDetails>
     </Container>

@@ -5,7 +5,8 @@ import OrderBill from '../components/Order/OrderBill';
 import type { CartItemType } from '../types/product.types';
 import { useState } from 'react';
 import { saveSelectedIds } from '../utils/cartStorage';
-import { calculateOrderBill } from '../utils/calculateOrderBill';
+import { calculateOrderBill } from '../domain/calculateOrderBill';
+import { getOrderCountState } from '../domain/orderCount';
 
 const mockProducts: CartItemType[] = [
   {
@@ -60,7 +61,7 @@ export default function CartPage() {
   const handleDecrease = (id: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id && item.orderCount > 1
+        item.id === id && getOrderCountState(item.orderCount).canDecrease
           ? { ...item, orderCount: item.orderCount - 1 }
           : item,
       ),
@@ -70,7 +71,7 @@ export default function CartPage() {
   const handleIncrease = (id: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id && item.orderCount < 99
+        item.id === id && getOrderCountState(item.orderCount).canIncrease
           ? { ...item, orderCount: item.orderCount + 1 }
           : item,
       ),
