@@ -5,6 +5,7 @@ import OrderBill from '../components/Order/OrderBill';
 import type { CartItemType } from '../types/product.types';
 import { useState } from 'react';
 import { saveSelectedIds } from '../utils/cartStorage';
+import { calculateOrderBill } from '../utils/calculateOrderBill';
 
 const mockProducts: CartItemType[] = [
   {
@@ -56,6 +57,26 @@ export default function CartPage() {
     });
   };
 
+  const handleDecrease = (id: number) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.id === id && item.orderCount > 1
+          ? { ...item, orderCount: item.orderCount - 1 }
+          : item,
+      ),
+    );
+  };
+
+  const handleIncrease = (id: number) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.id === id && item.orderCount < 99
+          ? { ...item, orderCount: item.orderCount + 1 }
+          : item,
+      ),
+    );
+  };
+
   const handleDelete = () => {};
 
   return (
@@ -66,9 +87,11 @@ export default function CartPage() {
         selectedIds={selectedIds}
         onSelect={handleSelect}
         onSelectAll={handleSelectAll}
+        onDecrease={handleDecrease}
+        onIncrease={handleIncrease}
         onDelete={handleDelete}
       />
-      <OrderBill />
+      <OrderBill orderBill={calculateOrderBill(cartItems, selectedIds)} />
       <OrderConfirmButton>주문 확인</OrderConfirmButton>
     </Container>
   );

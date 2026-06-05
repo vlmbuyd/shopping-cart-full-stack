@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import ProductCard from '../Product/ProductCard';
-import QuantityStepper from './QuantityStepper';
+import OrderCountStepper from './OrderCountStepper';
 import CheckBox from '../CheckBox/CheckBox';
 import CartItem from './CartItem';
 import type { CartItemType } from '../../types/product.types';
@@ -10,6 +10,8 @@ interface Props {
   selectedIds: Set<number>;
   onSelect: (id: number, isSelected: boolean) => void;
   onSelectAll: () => void;
+  onDecrease: (id: number) => void;
+  onIncrease: (id: number) => void;
   onDelete: () => void;
 }
 
@@ -18,6 +20,8 @@ export default function CartItemList({
   selectedIds,
   onSelect,
   onSelectAll,
+  onDecrease,
+  onIncrease,
   onDelete,
 }: Props) {
   return (
@@ -40,10 +44,10 @@ export default function CartItemList({
           <ProductCard
             data={product}
             action={
-              <QuantityStepper
-                quantity={2}
-                onDecrease={() => {}}
-                onIncrease={() => {}}
+              <OrderCountStepper
+                orderCount={product.orderCount}
+                onDecrease={() => onDecrease(product.id)}
+                onIncrease={() => onIncrease(product.id)}
               />
             }
           />
