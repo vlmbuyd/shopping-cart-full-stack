@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import AppService from './service/AppService.js';
 import { errorHandler } from './errors/errorHandler.js';
 import ProductService from './domain/product/product.service.js';
@@ -30,6 +31,11 @@ const appService = createAppService(
 );
 
 const app = express();
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
+  }),
+);
 app.use(express.json());
 
 // 상품 조회
