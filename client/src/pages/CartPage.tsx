@@ -1,9 +1,9 @@
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
 import OrderBill from '../components/Order/OrderBill';
 import type { CartItemType } from '../types/product.types';
-import { useState } from 'react';
 import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
 import { getOrderCountState } from '../domain/orderCount';
@@ -78,7 +78,9 @@ export default function CartPage() {
     );
   };
 
-  const handleDelete = () => {};
+  const handleDelete = (id: number) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
 
   return (
     <Container>

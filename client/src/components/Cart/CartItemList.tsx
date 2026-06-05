@@ -12,7 +12,7 @@ interface Props {
   onSelectAll: () => void;
   onDecrease: (id: number) => void;
   onIncrease: (id: number) => void;
-  onDelete: () => void;
+  onDelete: (id: number) => void;
 }
 
 export default function CartItemList({
@@ -39,7 +39,7 @@ export default function CartItemList({
           key={product.id}
           isSelected={selectedIds.has(product.id)}
           onSelect={(isSelected) => onSelect(product.id, isSelected)}
-          onDelete={onDelete}
+          onDelete={() => onDelete(product.id)}
         >
           <ProductCard
             data={product}
