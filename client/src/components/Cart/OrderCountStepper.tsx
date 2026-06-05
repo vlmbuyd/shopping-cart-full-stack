@@ -3,13 +3,13 @@ import decreaseIcon from '../../assets/subtract.svg';
 import increaseIcon from '../../assets/add.svg';
 
 interface Props {
-  quantity: number;
+  orderCount: number;
   onDecrease: () => void;
   onIncrease: () => void;
 }
 
-export default function QuantityStepper({
-  quantity,
+export default function OrderCountStepper({
+  orderCount,
   onDecrease,
   onIncrease,
 }: Props) {
@@ -19,7 +19,7 @@ export default function QuantityStepper({
         <img src={decreaseIcon} alt="decrease-icon" />
       </DecreaseButton>
 
-      <Quantity>{quantity}</Quantity>
+      <OrderCount>{orderCount}</OrderCount>
 
       <IncreaseButton onClick={onIncrease}>
         <img src={increaseIcon} alt="increase-icon" />
@@ -36,7 +36,7 @@ const Container = styled.div`
   height: 24px;
 `;
 
-const Quantity = styled.span`
+const OrderCount = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
