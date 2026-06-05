@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
@@ -7,32 +7,25 @@ import type { CartItemType } from '../types/product.types';
 import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
 import { getOrderCountState } from '../domain/orderCount';
-
-const mockProducts: CartItemType[] = [
-  {
-    id: 1,
-    name: '상품이름A',
-    price: 35000,
-    imgUrl: 'https://picsum.photos/200/200',
-    orderCount: 3,
-  },
-  {
-    id: 2,
-    name: '상품이름B',
-    price: 25000,
-    imgUrl: 'https://picsum.photos/200/200',
-    orderCount: 2,
-  },
-];
+import { getCartList } from '../api/cart';
+import { useQuery } from '../api/useQuery';
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItemType[]>(mockProducts);
+  const [cartItems, setCartItems] = useState<CartItemType[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(() => {
     const saved = localStorage.getItem('selectedCartIds');
     if (saved) return new Set(JSON.parse(saved));
 
     return new Set(cartItems.map((item) => item.id));
   });
+
+  const { data, isLoading, isSuccess, isError, refetch } = useQuery({
+    queryFn: getCartList,
+  });
+
+  useEffect(() => {
+    if (data) setCartItems(data);
+  }, []);
 
   const handleSelect = (id: number, isSelected: boolean) => {
     setSelectedIds((prev) => {
@@ -85,24 +78,53 @@ export default function CartPage() {
   return (
     <Container>
       <CartHeader totalCount={selectedIds.size} />
-      <CartItemList
-        cartItems={cartItems}
-        selectedIds={selectedIds}
-        onSelect={handleSelect}
-        onSelectAll={handleSelectAll}
-        onDecrease={handleDecrease}
-        onIncrease={handleIncrease}
-        onDelete={handleDelete}
-      />
-      <OrderBill orderBill={calculateOrderBill(cartItems, selectedIds)} />
-      <OrderConfirmButton>주문 확인</OrderConfirmButton>
+      {isSuccess && cartItems && cartItems.length > 0 && (
+        <>
+          <CartItemList
+            cartItems={cartItems}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            onSelectAll={handleSelectAll}
+            onDecrease={handleDecrease}
+            onIncrease={handleIncrease}
+            onDelete={handleDelete}
+          />
+          <OrderBill orderBill={calculateOrderBill(cartItems, selectedIds)} />
+        </>
+      )}
+
+      {isSuccess && cartItems && cartItems.length === 0 && (
+        <EmptyItem>장바구니에 담은 상품이 없습니다.</EmptyItem>
+      )}
+
+      <OrderConfirmButton
+        disabled={
+          (cartItems && cartItems.length === 0) || cartItems.length === 0
+        }
+      >
+        주문 확인
+      </OrderConfirmButton>
     </Container>
   );
 }
 
 const Container = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
+`;
+
+const EmptyItem = styled.p`
+  position: absolute;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 400;
+  color: #0a0d13;
+  text-align: center;
 `;
 
 const OrderConfirmButton = styled.button`
@@ -116,4 +138,9 @@ const OrderConfirmButton = styled.button`
   height: 64px;
   background-color: #000;
   color: #fff;
+
+  &:disabled {
+    background-color: #bebebe;
+    cursor: not-allowed;
+  }
 `;

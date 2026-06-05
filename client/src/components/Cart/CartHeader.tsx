@@ -5,7 +5,9 @@ export default function CartHeader({ totalCount }: { totalCount: number }) {
     <Container>
       <Header>
         <Title>장바구니</Title>
-        <Subtitle>현재 {totalCount}종류의 상품이 담겨있습니다.</Subtitle>
+        {totalCount > 0 && (
+          <Subtitle>현재 {totalCount}종류의 상품이 담겨있습니다.</Subtitle>
+        )}
       </Header>
     </Container>
   );
