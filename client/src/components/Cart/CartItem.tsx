@@ -1,11 +1,11 @@
-import type { ReactNode, MouseEvent } from 'react';
+import type { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import CheckBox from '../CheckBox/CheckBox';
 
 interface Props {
   isSelected: boolean;
   onSelect: (isSelected: boolean) => void;
-  onDelete: (e: MouseEvent<HTMLButtonElement>) => void;
+  onDelete: () => void;
   children: ReactNode;
 }
 
