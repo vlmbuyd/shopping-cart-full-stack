@@ -3,33 +3,27 @@ import styled from '@emotion/styled';
 import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
 import OrderBill from '../components/Order/OrderBill';
-import type { CartItemType } from '../types/product.types';
 import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
-import {
-  getOrderCountState,
-  MAX_ORDER_COUNT,
-  MIN_ORDER_COUNT,
-} from '../domain/orderCount';
+import { MAX_ORDER_COUNT, MIN_ORDER_COUNT } from '../domain/orderCount';
 import { deleteCartItem, getCartList, updateCartItem } from '../api/cart';
 import { useQuery } from '../api/useQuery';
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItemType[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => {
-    const saved = localStorage.getItem('selectedCartIds');
-    if (saved) return new Set(JSON.parse(saved));
-
-    return new Set(cartItems.map((item) => item.id));
-  });
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   const { data, isSuccess, refetch } = useQuery({
     queryFn: getCartList,
   });
+  const cartItems = data?.result.cartItems ?? [];
 
   useEffect(() => {
-    if (data && isSuccess) {
-      setCartItems(data.result.cartItems);
+    if (data) {
+      const saved = localStorage.getItem('selectedCartIds');
+      if (saved) setSelectedIds(new Set(JSON.parse(saved)));
+      else {
+        setSelectedIds(new Set(data.result.cartItems.map((item) => item.id)));
+      }
     }
   }, [data]);
 
@@ -95,6 +89,7 @@ export default function CartPage() {
 
   return (
     <Container>
+      {/* TODO: 버그 수정 */}
       <CartHeader totalCount={selectedIds.size} />
       {isSuccess && cartItems.length > 0 && (
         <>
@@ -114,7 +109,7 @@ export default function CartPage() {
         <EmptyItem>장바구니에 담은 상품이 없습니다.</EmptyItem>
       )}
 
-      <OrderConfirmButton disabled={cartItems && cartItems.length === 0}>
+      <OrderConfirmButton disabled={cartItems.length === 0}>
         주문 확인
       </OrderConfirmButton>
     </Container>
