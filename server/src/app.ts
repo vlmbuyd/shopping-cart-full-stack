@@ -100,15 +100,16 @@ app.get('/carts', (_, res) => {
 });
 
 // 장바구니 상품 추가
-app.post('/carts', (req, res) => {
+app.post('/carts/:cartItemId', (req, res) => {
   try {
-    const { id, orderCount } = req.body;
+    const { orderCount } = req.body;
+    const cartItemId = req.params.cartItemId;
 
-    const cartItemId = appService.addCartItem({ id, orderCount });
+    const id = appService.addCartItem({ id: Number(cartItemId), orderCount });
 
     res.status(201).json({
       message: '성공적으로 생성되었습니다.',
-      result: { id: cartItemId },
+      result: { id },
     });
   } catch (error) {
     const { status, code, message } = errorHandler(error);
