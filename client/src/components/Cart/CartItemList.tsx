@@ -4,6 +4,7 @@ import OrderCountStepper from './OrderCountStepper';
 import CheckBox from '../CheckBox/CheckBox';
 import CartItem from './CartItem';
 import type { CartItemType } from '../../types/product.types';
+import { isAllSelected } from '../../utils/cartStorage';
 
 interface Props {
   cartItems: CartItemType[];
@@ -26,7 +27,7 @@ export default function CartItemList({
     <Container>
       <SelectAll>
         <CheckBox
-          isSelected={cartItems.length === selectedIds.size}
+          isSelected={isAllSelected(cartItems, selectedIds)}
           onSelect={onSelectAll}
         />
         <span>전체선택</span>

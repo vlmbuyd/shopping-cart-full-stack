@@ -4,7 +4,7 @@ import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
 import CartItemListSkeleton from '../components/Cart/CartItemListSkeleton';
 import OrderBill from '../components/Order/OrderBill';
-import { saveSelectedIds } from '../utils/cartStorage';
+import { isAllSelected, saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
 import { MAX_ORDER_COUNT, MIN_ORDER_COUNT } from '../domain/orderCount';
 import { deleteCartItem, getCartList, updateCartItem } from '../api/cart';
@@ -43,7 +43,7 @@ export default function CartPage() {
     setSelectedIds(() => {
       const next = new Set<number>();
 
-      if (selectedIds.size !== cartItems.length) {
+      if (!isAllSelected(cartItems, selectedIds)) {
         cartItems.forEach((item) => {
           next.add(item.id);
         });
@@ -58,6 +58,17 @@ export default function CartPage() {
     try {
       await deleteCartItem(id);
       refetch();
+      setSelectedIds((prev) => {
+        const next = new Set<number>(prev);
+
+        if (next.has(id)) {
+          next.delete(id);
+        }
+
+        saveSelectedIds([...next]);
+
+        return next;
+      });
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
@@ -90,7 +101,6 @@ export default function CartPage() {
 
   return (
     <Container>
-      {/* TODO: 버그 수정 */}
       <CartHeader totalCount={selectedIds.size} />
 
       {isLoading && <CartItemListSkeleton />}
