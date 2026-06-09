@@ -1,58 +1,23 @@
-import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
 import CartItemListSkeleton from '../components/Cart/CartItemListSkeleton';
 import OrderBill from '../components/Order/OrderBill';
-import { isAllSelected, saveSelectedIds } from '../utils/cartStorage';
+import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
 import { MAX_ORDER_COUNT, MIN_ORDER_COUNT } from '../domain/orderCount';
 import { deleteCartItem, getCartList, updateCartItem } from '../api/cart';
 import { useQuery } from '../api/useQuery';
+import { useCartItemSelect } from '../hooks/useCartItemSelect';
 
 export default function CartPage() {
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-
   const { data, isLoading, isSuccess, refetch } = useQuery({
     queryFn: getCartList,
   });
   const cartItems = data?.result.cartItems ?? [];
 
-  useEffect(() => {
-    if (data) {
-      const saved = localStorage.getItem('selectedCartIds');
-      if (saved) setSelectedIds(new Set(JSON.parse(saved)));
-      else {
-        setSelectedIds(new Set(data.result.cartItems.map((item) => item.id)));
-      }
-    }
-  }, [data]);
-
-  const handleSelect = (id: number, isSelected: boolean) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (isSelected) next.add(id);
-      else next.delete(id);
-
-      saveSelectedIds([...next]);
-      return next;
-    });
-  };
-
-  const handleSelectAll = () => {
-    setSelectedIds(() => {
-      const next = new Set<number>();
-
-      if (!isAllSelected(cartItems, selectedIds)) {
-        cartItems.forEach((item) => {
-          next.add(item.id);
-        });
-      }
-
-      saveSelectedIds([...next]);
-      return next;
-    });
-  };
+  const { selectedIds, setSelectedIds, handleSelect, handleSelectAll } =
+    useCartItemSelect(cartItems.map((i) => i.id));
 
   const handleDelete = async (id: number) => {
     try {

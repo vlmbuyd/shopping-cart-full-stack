@@ -27,7 +27,10 @@ export default function CartItemList({
     <Container>
       <SelectAll>
         <CheckBox
-          isSelected={isAllSelected(cartItems, selectedIds)}
+          isSelected={isAllSelected(
+            cartItems.map((i) => i.id),
+            selectedIds,
+          )}
           onSelect={onSelectAll}
         />
         <span>전체선택</span>
