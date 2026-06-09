@@ -286,6 +286,7 @@ const mockCartItem = {
 
 describe('GET /carts API 테스트', () => {
   beforeEach(() => {
+    products.length = 0;
     cartItems.length = 0;
   });
 
@@ -303,10 +304,9 @@ describe('GET /carts API 테스트', () => {
 
   test('장바구니에 상품 추가 후 조회 시 해당 상품이 목록에 포함된다.', async () => {
     // given
-    const postResponse = await request(app)
-      .post(`/carts/${mockCartItem.id}`)
-      .send(mockCartItem);
-    const { id: cartItemId } = postResponse.body.result;
+    const productResponse = await request(app).post('/products').send(mockProduct);
+    const { id: productId } = productResponse.body.result;
+    await request(app).post(`/carts/${productId}`).send({ orderCount: 2 });
 
     // when
     const response = await request(app).get('/carts');
@@ -315,9 +315,39 @@ describe('GET /carts API 테스트', () => {
     expect(response.status).toBe(200);
     expect(response.body.result.cartItems).toContainEqual(
       expect.objectContaining({
-        id: cartItemId,
-        orderCount: mockCartItem.orderCount,
+        id: productId,
+        name: mockProduct.name,
+        price: mockProduct.price,
+        imgUrl: mockProduct.imgUrl,
+        orderCount: 2,
       }),
+    );
+  });
+
+  test('장바구니에 상품 2개 추가 후 조회 시 2개가 모두 목록에 포함된다.', async () => {
+    // given
+    const product1Response = await request(app).post('/products').send(mockProduct);
+    const { id: productId1 } = product1Response.body.result;
+
+    const product2Response = await request(app)
+      .post('/products')
+      .send({ ...mockProduct, name: '나이키 양말' });
+    const { id: productId2 } = product2Response.body.result;
+
+    await request(app).post(`/carts/${productId1}`).send({ orderCount: 1 });
+    await request(app).post(`/carts/${productId2}`).send({ orderCount: 2 });
+
+    // when
+    const response = await request(app).get('/carts');
+
+    // then
+    expect(response.status).toBe(200);
+    expect(response.body.result.cartItems).toHaveLength(2);
+    expect(response.body.result.cartItems).toContainEqual(
+      expect.objectContaining({ id: productId1, name: mockProduct.name, orderCount: 1 }),
+    );
+    expect(response.body.result.cartItems).toContainEqual(
+      expect.objectContaining({ id: productId2, name: '나이키 양말', orderCount: 2 }),
     );
   });
 });
