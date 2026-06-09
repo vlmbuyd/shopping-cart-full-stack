@@ -1,8 +1,12 @@
 import type { CartItemType } from '../types/product.types';
-import { http } from './api';
+import { http, type APIResponse } from './api';
 
-export type CartListResponse = CartItemType[];
-
-export const getCartList = (): Promise<CartListResponse> => {
-  return http.get<CartListResponse>('/products');
+type CartItemListResponse = {
+  cartItems: CartItemType[];
 };
+
+export const getCartList = (): Promise<APIResponse<CartItemListResponse>> =>
+  http.get<APIResponse<CartItemListResponse>>('/carts');
+
+export const deleteCartItem = (id: number): Promise<void> =>
+  http.delete<void>(`/carts/${id}`);

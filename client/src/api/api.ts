@@ -1,5 +1,9 @@
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+export type APIResponse<T> = {
+  message: string;
+  result: T;
+};
 type RequestOptions = Omit<RequestInit, 'method' | 'body'>;
 
 const request = async <TResponse>(

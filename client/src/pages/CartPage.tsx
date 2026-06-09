@@ -7,7 +7,7 @@ import type { CartItemType } from '../types/product.types';
 import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
 import { getOrderCountState } from '../domain/orderCount';
-import { getCartList } from '../api/cart';
+import { deleteCartItem, getCartList } from '../api/cart';
 import { useQuery } from '../api/useQuery';
 
 export default function CartPage() {
@@ -19,13 +19,15 @@ export default function CartPage() {
     return new Set(cartItems.map((item) => item.id));
   });
 
-  const { data, isLoading, isSuccess, isError, refetch } = useQuery({
+  const { data, isSuccess, refetch } = useQuery({
     queryFn: getCartList,
   });
 
   useEffect(() => {
-    if (data) setCartItems(data);
-  }, []);
+    if (data && isSuccess) {
+      setCartItems(data.result.cartItems);
+    }
+  }, [data]);
 
   const handleSelect = (id: number, isSelected: boolean) => {
     setSelectedIds((prev) => {
@@ -41,10 +43,12 @@ export default function CartPage() {
   const handleSelectAll = () => {
     setSelectedIds(() => {
       const next = new Set<number>();
-      cartItems.forEach((item) => {
-        if (selectedIds.size === 0) next.add(item.id);
-        else next.delete(item.id);
-      });
+
+      if (selectedIds.size !== cartItems.length) {
+        cartItems.forEach((item) => {
+          next.add(item.id);
+        });
+      }
 
       saveSelectedIds([...next]);
       return next;
@@ -71,14 +75,19 @@ export default function CartPage() {
     );
   };
 
-  const handleDelete = (id: number) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteCartItem(id);
+      refetch();
+    } catch (err) {
+      if (err instanceof Error) alert(err.message);
+    }
   };
 
   return (
     <Container>
       <CartHeader totalCount={selectedIds.size} />
-      {isSuccess && cartItems && cartItems.length > 0 && (
+      {isSuccess && cartItems.length > 0 && (
         <>
           <CartItemList
             cartItems={cartItems}
@@ -93,15 +102,11 @@ export default function CartPage() {
         </>
       )}
 
-      {isSuccess && cartItems && cartItems.length === 0 && (
+      {isSuccess && cartItems.length === 0 && (
         <EmptyItem>장바구니에 담은 상품이 없습니다.</EmptyItem>
       )}
 
-      <OrderConfirmButton
-        disabled={
-          (cartItems && cartItems.length === 0) || cartItems.length === 0
-        }
-      >
+      <OrderConfirmButton disabled={cartItems && cartItems.length === 0}>
         주문 확인
       </OrderConfirmButton>
     </Container>
