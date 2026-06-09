@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
+import CartItemListSkeleton from '../components/Cart/CartItemListSkeleton';
 import OrderBill from '../components/Order/OrderBill';
 import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
@@ -12,7 +13,7 @@ import { useQuery } from '../api/useQuery';
 export default function CartPage() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-  const { data, isSuccess, refetch } = useQuery({
+  const { data, isLoading, isSuccess, refetch } = useQuery({
     queryFn: getCartList,
   });
   const cartItems = data?.result.cartItems ?? [];
@@ -91,6 +92,9 @@ export default function CartPage() {
     <Container>
       {/* TODO: 버그 수정 */}
       <CartHeader totalCount={selectedIds.size} />
+
+      {isLoading && <CartItemListSkeleton />}
+
       {isSuccess && cartItems.length > 0 && (
         <>
           <CartItemList
