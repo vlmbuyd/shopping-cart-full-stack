@@ -30,14 +30,15 @@ export const http = {
     options?: RequestOptions,
   ) =>
     request<TResponse>(path, {
-      ...options,
+      headers: { 'Content-Type': 'application/json' },
       method: 'PATCH',
       body: JSON.stringify(body),
+      ...options,
     }),
 
   delete: <TResponse>(path: string, options?: RequestOptions) =>
     request<TResponse>(path, {
-      ...options,
       method: 'DELETE',
+      ...options,
     }),
 };

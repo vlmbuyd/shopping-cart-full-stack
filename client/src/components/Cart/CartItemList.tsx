@@ -10,8 +10,7 @@ interface Props {
   selectedIds: Set<number>;
   onSelect: (id: number, isSelected: boolean) => void;
   onSelectAll: () => void;
-  onDecrease: (id: number) => void;
-  onIncrease: (id: number) => void;
+  onUpdate: (id: number, orderCount: number, delta: 1 | -1) => void;
   onDelete: (id: number) => void;
 }
 
@@ -20,8 +19,7 @@ export default function CartItemList({
   selectedIds,
   onSelect,
   onSelectAll,
-  onDecrease,
-  onIncrease,
+  onUpdate,
   onDelete,
 }: Props) {
   return (
@@ -34,20 +32,24 @@ export default function CartItemList({
         <span>전체선택</span>
       </SelectAll>
 
-      {cartItems.map((product) => (
+      {cartItems.map((cartItem) => (
         <CartItem
-          key={product.id}
-          isSelected={selectedIds.has(product.id)}
-          onSelect={(isSelected) => onSelect(product.id, isSelected)}
-          onDelete={() => onDelete(product.id)}
+          key={cartItem.id}
+          isSelected={selectedIds.has(cartItem.id)}
+          onSelect={(isSelected) => onSelect(cartItem.id, isSelected)}
+          onDelete={() => onDelete(cartItem.id)}
         >
           <ProductCard
-            data={product}
+            data={cartItem}
             action={
               <OrderCountStepper
-                orderCount={product.orderCount}
-                onDecrease={() => onDecrease(product.id)}
-                onIncrease={() => onIncrease(product.id)}
+                orderCount={cartItem.orderCount}
+                onDecrease={() =>
+                  onUpdate(cartItem.id, cartItem.orderCount, -1)
+                }
+                onIncrease={() =>
+                  onUpdate(cartItem.id, cartItem.orderCount, +1)
+                }
               />
             }
           />

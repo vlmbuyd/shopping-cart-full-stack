@@ -6,8 +6,12 @@ import OrderBill from '../components/Order/OrderBill';
 import type { CartItemType } from '../types/product.types';
 import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
-import { getOrderCountState } from '../domain/orderCount';
-import { deleteCartItem, getCartList } from '../api/cart';
+import {
+  getOrderCountState,
+  MAX_ORDER_COUNT,
+  MIN_ORDER_COUNT,
+} from '../domain/orderCount';
+import { deleteCartItem, getCartList, updateCartItem } from '../api/cart';
 import { useQuery } from '../api/useQuery';
 
 export default function CartPage() {
@@ -55,32 +59,37 @@ export default function CartPage() {
     });
   };
 
-  const handleDecrease = (id: number) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id && getOrderCountState(item.orderCount).canDecrease
-          ? { ...item, orderCount: item.orderCount - 1 }
-          : item,
-      ),
-    );
-  };
-
-  const handleIncrease = (id: number) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id && getOrderCountState(item.orderCount).canIncrease
-          ? { ...item, orderCount: item.orderCount + 1 }
-          : item,
-      ),
-    );
-  };
-
   const handleDelete = async (id: number) => {
     try {
       await deleteCartItem(id);
       refetch();
     } catch (err) {
-      if (err instanceof Error) alert(err.message);
+      if (err instanceof Error) {
+        alert(err.message);
+      }
+    }
+  };
+
+  const handleUpdate = async (
+    id: number,
+    orderCount: number,
+    delta: 1 | -1,
+  ) => {
+    const updatedOrderCount = orderCount + delta;
+    if (
+      updatedOrderCount < MIN_ORDER_COUNT ||
+      updatedOrderCount > MAX_ORDER_COUNT
+    ) {
+      return;
+    }
+
+    try {
+      await updateCartItem(id, updatedOrderCount);
+      refetch();
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(err.message);
+      }
     }
   };
 
@@ -94,8 +103,7 @@ export default function CartPage() {
             selectedIds={selectedIds}
             onSelect={handleSelect}
             onSelectAll={handleSelectAll}
-            onDecrease={handleDecrease}
-            onIncrease={handleIncrease}
+            onUpdate={handleUpdate}
             onDelete={handleDelete}
           />
           <OrderBill orderBill={calculateOrderBill(cartItems, selectedIds)} />
