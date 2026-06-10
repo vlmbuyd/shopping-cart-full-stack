@@ -24,7 +24,21 @@ export default class AppSerivce {
   }
 
   getCartItems() {
-    return this.cartService.getCartItems();
+    const cartItems = this.cartService.getCartItems();
+
+    return cartItems.map((item) => {
+      const itemId = item.toJson().id;
+      const product = this.productService.getProductById(itemId);
+      const { name, price, imgUrl } = product.toJson();
+
+      return {
+        id: itemId,
+        name,
+        price,
+        imgUrl,
+        orderCount: item.toJson().orderCount,
+      };
+    });
   }
 
   addCartItem({ id, orderCount }: CartItemType) {

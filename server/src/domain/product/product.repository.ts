@@ -1,3 +1,4 @@
+import AppError from '../../errors/AppError.js';
 import { products } from '../../db/inMemoryDb.js';
 import Product from '../../model/Product.js';
 
@@ -10,6 +11,8 @@ export interface ProductRepository {
 }
 
 export class InMemoryProductRepository implements ProductRepository {
+  private id = 0;
+
   findAll() {
     return [...products];
   }
@@ -17,7 +20,7 @@ export class InMemoryProductRepository implements ProductRepository {
   findById(id: number) {
     const target = products.find((product) => product.toJson().id === id);
 
-    if (!target) throw new Error('PRODUCT_NOT_EXIST');
+    if (!target) throw new AppError('PRODUCT_NOT_EXIST');
 
     return target;
   }
@@ -32,7 +35,6 @@ export class InMemoryProductRepository implements ProductRepository {
   }
 
   nextId() {
-    const lastId = products.length + 1;
-    return lastId;
+    return ++this.id;
   }
 }

@@ -252,7 +252,7 @@ describe('DELETE /products/:id API 테스트', () => {
     // given
     const postResponse = await request(app).post('/products').send(mockProduct);
     const { id } = postResponse.body.result;
-    await request(app).post('/carts').send({ id, orderCount: 2 });
+    await request(app).post(`/carts/${id}`).send({ orderCount: 2 });
 
     // when
     const response = await request(app).delete(`/products/${id}`);
@@ -286,6 +286,7 @@ const mockCartItem = {
 
 describe('GET /carts API 테스트', () => {
   beforeEach(() => {
+    products.length = 0;
     cartItems.length = 0;
   });
 
@@ -303,7 +304,9 @@ describe('GET /carts API 테스트', () => {
 
   test('장바구니에 상품 추가 후 조회 시 해당 상품이 목록에 포함된다.', async () => {
     // given
-    await request(app).post('/carts').send(mockCartItem);
+    const productResponse = await request(app).post('/products').send(mockProduct);
+    const { id: productId } = productResponse.body.result;
+    await request(app).post(`/carts/${productId}`).send({ orderCount: 2 });
 
     // when
     const response = await request(app).get('/carts');
@@ -312,9 +315,39 @@ describe('GET /carts API 테스트', () => {
     expect(response.status).toBe(200);
     expect(response.body.result.cartItems).toContainEqual(
       expect.objectContaining({
-        id: mockCartItem.id,
-        orderCount: mockCartItem.orderCount,
+        id: productId,
+        name: mockProduct.name,
+        price: mockProduct.price,
+        imgUrl: mockProduct.imgUrl,
+        orderCount: 2,
       }),
+    );
+  });
+
+  test('장바구니에 상품 2개 추가 후 조회 시 2개가 모두 목록에 포함된다.', async () => {
+    // given
+    const product1Response = await request(app).post('/products').send(mockProduct);
+    const { id: productId1 } = product1Response.body.result;
+
+    const product2Response = await request(app)
+      .post('/products')
+      .send({ ...mockProduct, name: '나이키 양말' });
+    const { id: productId2 } = product2Response.body.result;
+
+    await request(app).post(`/carts/${productId1}`).send({ orderCount: 1 });
+    await request(app).post(`/carts/${productId2}`).send({ orderCount: 2 });
+
+    // when
+    const response = await request(app).get('/carts');
+
+    // then
+    expect(response.status).toBe(200);
+    expect(response.body.result.cartItems).toHaveLength(2);
+    expect(response.body.result.cartItems).toContainEqual(
+      expect.objectContaining({ id: productId1, name: mockProduct.name, orderCount: 1 }),
+    );
+    expect(response.body.result.cartItems).toContainEqual(
+      expect.objectContaining({ id: productId2, name: '나이키 양말', orderCount: 2 }),
     );
   });
 });
@@ -326,7 +359,9 @@ describe('POST /carts API 테스트', () => {
 
   test('정상적인 요청 시 201과 생성된 id를 응답한다.', async () => {
     // when
-    const response = await request(app).post('/carts').send(mockCartItem);
+    const response = await request(app)
+      .post(`/carts/${mockCartItem.id}`)
+      .send(mockCartItem);
 
     // then
     expect(response.status).toBe(201);
@@ -338,7 +373,7 @@ describe('POST /carts API 테스트', () => {
 
   test('orderCount 필드가 누락되면 400과 EMPTY_PRODUCT_ORDER_COUNT 코드를 응답한다.', async () => {
     // when
-    const response = await request(app).post('/carts').send({ id: 1 });
+    const response = await request(app).post('/carts/1').send({});
 
     // then
     expect(response.status).toBe(400);
@@ -351,8 +386,8 @@ describe('POST /carts API 테스트', () => {
   test('orderCount가 0 이하이면 400과 INVALID_PRODUCT_ORDER_COUNT_TYPE 코드를 응답한다.', async () => {
     // when
     const response = await request(app)
-      .post('/carts')
-      .send({ id: 1, orderCount: 0 });
+      .post('/carts/1')
+      .send({ orderCount: 0 });
 
     // then
     expect(response.status).toBe(400);
@@ -370,7 +405,7 @@ describe('DELETE /carts/:id API 테스트', () => {
 
   test('존재하는 장바구니 상품 삭제 시 204를 응답한다.', async () => {
     // given
-    await request(app).post('/carts').send(mockCartItem);
+    await request(app).post(`/carts/${mockCartItem.id}`).send(mockCartItem);
 
     // when
     const response = await request(app).delete(`/carts/${mockCartItem.id}`);
@@ -381,7 +416,7 @@ describe('DELETE /carts/:id API 테스트', () => {
 
   test('장바구니 상품 삭제 후 조회 시 해당 상품이 목록에서 제거된다.', async () => {
     // given
-    await request(app).post('/carts').send(mockCartItem);
+    await request(app).post(`/carts/${mockCartItem.id}`).send(mockCartItem);
 
     // when
     await request(app).delete(`/carts/${mockCartItem.id}`);
@@ -417,7 +452,7 @@ describe('PATCH /carts/:id API 테스트', () => {
     cartItems.length = 0;
     const postResponse = await request(app).post('/products').send(mockProduct);
     productId = postResponse.body.result.id;
-    await request(app).post('/carts').send({ id: productId, orderCount: 1 });
+    await request(app).post(`/carts/${productId}`).send({ orderCount: 1 });
   });
 
   test('정상적인 수량 변경 요청 시 200과 변경된 수량 정보를 응답한다.', async () => {
@@ -453,9 +488,7 @@ describe('PATCH /carts/:id API 테스트', () => {
 
   test('orderCount 필드가 누락되면 400과 EMPTY_PRODUCT_ORDER_COUNT 코드를 응답한다.', async () => {
     // when
-    const response = await request(app)
-      .patch(`/carts/${productId}`)
-      .send({});
+    const response = await request(app).patch(`/carts/${productId}`).send({});
 
     // then
     expect(response.status).toBe(400);
