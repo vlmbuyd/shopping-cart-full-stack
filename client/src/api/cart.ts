@@ -1,3 +1,4 @@
+import type { Payment } from '../types/payment.types';
 import type { CartItemType } from '../types/product.types';
 import { http, type APIResponse } from './api';
 
@@ -17,3 +18,8 @@ export const updateCartItem = (
   body: UpdateCartItemBody,
 ): Promise<APIResponse<UpdateCartItemResponse>> =>
   http.patch<APIResponse<UpdateCartItemResponse>>(`/carts/${id}`, body);
+
+type GetCartPaymentsResponse = Payment;
+export const getCartPayments = (): Promise<
+  APIResponse<GetCartPaymentsResponse>
+> => http.get<APIResponse<GetCartPaymentsResponse>>('/carts/payment');

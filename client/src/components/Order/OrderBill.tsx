@@ -1,16 +1,25 @@
 import styled from '@emotion/styled';
 import infoIcon from '../../assets/info.svg';
 import { formatPrice } from '../../utils/formatPrice';
+import { getCartPayments } from '../../api/cart';
+import { useQuery } from '../../api/useQuery';
+import Skeleton from '../Skeleton/Skeleton';
 
-interface Props {
-  orderBill: {
-    orderPrice: number;
-    shippingFee: number;
-    totalPrice: number;
-  };
-}
+export default function OrderBill() {
+  const { data, isLoading, isSuccess } = useQuery({
+    queryFn: getCartPayments,
+  });
 
-export default function OrderBill({ orderBill }: Props) {
+  if (isLoading) {
+    return <OrderBillSkeleton />;
+  }
+
+  if (!isSuccess || !data) {
+    return null;
+  }
+
+  const { orderPrice, shippingFee, totalPrice } = data.result;
+
   return (
     <Container>
       <ShippingFeeInfo>
@@ -23,18 +32,46 @@ export default function OrderBill({ orderBill }: Props) {
       <OrderDetails>
         <OrderPrice>
           <p>주문 금액</p>
-          <strong>{formatPrice(orderBill.orderPrice)}원</strong>
+          <strong>{formatPrice(orderPrice)}원</strong>
         </OrderPrice>
         <ShippingFee>
           <p>배송비</p>
-          <strong>{formatPrice(orderBill.shippingFee)}원</strong>
+          <strong>{formatPrice(shippingFee)}원</strong>
         </ShippingFee>
       </OrderDetails>
 
       <OrderDetails>
         <TotalPrice>
           <p>총 결제 금액</p>
-          <strong>{formatPrice(orderBill.totalPrice)}원</strong>
+          <strong>{formatPrice(totalPrice)}원</strong>
+        </TotalPrice>
+      </OrderDetails>
+    </Container>
+  );
+}
+
+function OrderBillSkeleton() {
+  return (
+    <Container>
+      <ShippingFeeInfo>
+        <Skeleton width="100%" height="18px" />
+      </ShippingFeeInfo>
+
+      <OrderDetails>
+        <OrderPrice>
+          <Skeleton width="80px" height="24px" />
+          <Skeleton width="120px" height="24px" />
+        </OrderPrice>
+        <ShippingFee>
+          <Skeleton width="80px" height="24px" />
+          <Skeleton width="120px" height="24px" />
+        </ShippingFee>
+      </OrderDetails>
+
+      <OrderDetails>
+        <TotalPrice>
+          <Skeleton width="100px" height="24px" />
+          <Skeleton width="140px" height="24px" />
         </TotalPrice>
       </OrderDetails>
     </Container>
