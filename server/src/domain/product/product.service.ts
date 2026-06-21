@@ -13,6 +13,12 @@ class ProductService {
     return this.productRepository.findById(id);
   }
 
+  hasProduct(id: number) {
+    return this.productRepository
+      .findAll()
+      .some((product) => product.toJson().id === id);
+  }
+
   addProduct({ name, price, quantity, imgUrl }: Omit<ProductType, 'id'>) {
     const id = this.productRepository.nextId();
     const newProduct = new Product(id, name, price, quantity, imgUrl);

@@ -12,15 +12,22 @@ import {
   CartRepository,
   InMemoryCartRepository,
 } from './domain/cart/cart.repository.js';
+import OrderService from './domain/order/order.service.js';
+import {
+  InMemoryOrderRepository,
+  OrderRepository,
+} from './domain/order/order.repository.js';
 
 function createAppService(
   productRepo: ProductRepository,
   cartRepo: CartRepository,
+  orderRepo: OrderRepository,
 ) {
   const productService = new ProductService(productRepo);
   const cartService = new CartService(cartRepo);
+  const orderService = new OrderService(orderRepo);
 
-  const appService = new AppService(productService, cartService);
+  const appService = new AppService(productService, cartService, orderService);
 
   return appService;
 }
@@ -28,6 +35,7 @@ function createAppService(
 const appService = createAppService(
   new InMemoryProductRepository(),
   new InMemoryCartRepository(),
+  new InMemoryOrderRepository(),
 );
 
 const app = express();
@@ -160,6 +168,40 @@ app.patch('/carts/:cartItemId', (req, res) => {
     res.status(200).json({
       message: '성공적으로 변경되었습니다.',
       result: updated,
+    });
+  } catch (error) {
+    const { status, code, message } = errorHandler(error);
+    res.status(status).json({ code, message });
+  }
+});
+
+// 주문 생성
+app.post('/orders', (req, res) => {
+  try {
+    const { selectedProducts } = req.body;
+
+    const id = appService.createOrder(selectedProducts);
+
+    res.status(201).json({
+      message: '성공적으로 생성되었습니다.',
+      result: { id },
+    });
+  } catch (error) {
+    const { status, code, message } = errorHandler(error);
+    res.status(status).json({ code, message });
+  }
+});
+
+// 주문 정보 조회
+app.get('/orders/:orderId', (req, res) => {
+  try {
+    const orderId = Number(req.params.orderId);
+
+    const order = appService.getOrder(orderId);
+
+    res.status(200).json({
+      message: '요청에 성공했습니다.',
+      result: order,
     });
   } catch (error) {
     const { status, code, message } = errorHandler(error);
