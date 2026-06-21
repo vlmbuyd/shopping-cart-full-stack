@@ -422,3 +422,80 @@ describe('PATCH /orders/:id/coupons API 테스트', () => {
     expect(response.body.code).toBe('ORDER_NOT_EXIST');
   });
 });
+
+describe('쿠폰 적용 검증 (개수 제한 / 비활성 차단)', () => {
+  beforeEach(() => {
+    products.length = 0;
+    orders.length = 0;
+  });
+
+  const createOrder = async (
+    selectedProducts: { id: number; orderCount: number }[],
+  ) => {
+    const response = await request(app)
+      .post('/orders')
+      .send({ selectedProducts });
+
+    return response.body.result.id as number;
+  };
+
+  test('쿠폰을 3개 선택해 적용하면 400과 COUPON_SELECTION_EXCEEDED 코드를 응답한다.', async () => {
+    // given: 주문 금액 120,000원 (세 쿠폰 모두 적용 가능하지만 개수 초과)
+    const productId = await addProduct(60000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+
+    // when
+    const response = await request(app)
+      .patch(`/orders/${orderId}/coupons`)
+      .send({ coupons: [1, 2, 3] });
+
+    // then
+    expect(response.status).toBe(400);
+    expect(response.body.code).toBe('COUPON_SELECTION_EXCEEDED');
+  });
+
+  test('비활성(조건 미달) 쿠폰을 적용하면 400과 COUPON_NOT_APPLICABLE 코드를 응답한다.', async () => {
+    // given: 주문 금액 60,000원 (FIXED5000 최소 주문 100,000원 미달 → 비활성)
+    const productId = await addProduct(30000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+
+    // when
+    const response = await request(app)
+      .patch(`/orders/${orderId}/coupons`)
+      .send({ coupons: [1] });
+
+    // then
+    expect(response.status).toBe(400);
+    expect(response.body.code).toBe('COUPON_NOT_APPLICABLE');
+  });
+
+  test('할인 미리보기에서도 비활성 쿠폰이면 400과 COUPON_NOT_APPLICABLE 코드를 응답한다.', async () => {
+    // given: 주문 금액 60,000원
+    const productId = await addProduct(30000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+
+    // when
+    const response = await request(app)
+      .post(`/orders/${orderId}/coupons/discount`)
+      .send({ coupons: [1] });
+
+    // then
+    expect(response.status).toBe(400);
+    expect(response.body.code).toBe('COUPON_NOT_APPLICABLE');
+  });
+
+  test('할인 미리보기에서도 3개 선택하면 400과 COUPON_SELECTION_EXCEEDED 코드를 응답한다.', async () => {
+    // given
+    const productId = await addProduct(60000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+
+    // when
+    const response = await request(app)
+      .post(`/orders/${orderId}/coupons/discount`)
+      .send({ coupons: [1, 2, 3] });
+
+    // then
+    expect(response.status).toBe(400);
+    expect(response.body.code).toBe('COUPON_SELECTION_EXCEEDED');
+  });
+});

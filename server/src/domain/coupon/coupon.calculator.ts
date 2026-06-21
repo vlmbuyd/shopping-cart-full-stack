@@ -1,5 +1,7 @@
 import { Coupon } from '../../model/Coupon.js';
 
+export const MAX_SELECTABLE_COUPONS = 2;
+
 export type DiscountContext = {
   orderItems: { price: number; orderCount: number }[];
 
@@ -102,7 +104,10 @@ export function findBestCouponCombination(
   context: DiscountContext,
 ): Coupon[] {
   const usable = coupons.filter((coupon) => !isCouponDisabled(coupon, context));
-  const candidates = [...combinations(usable, 1), ...combinations(usable, 2)];
+  const candidates = Array.from(
+    { length: MAX_SELECTABLE_COUPONS },
+    (_, index) => combinations(usable, index + 1),
+  ).flat();
 
   let best: Coupon[] = [];
   let bestDiscount = 0;

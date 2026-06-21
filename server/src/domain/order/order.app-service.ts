@@ -1,6 +1,7 @@
 import CouponService from '../coupon/coupon.service.js';
 import {
   DiscountContext,
+  MAX_SELECTABLE_COUPONS,
   calculateCouponsDiscount,
   findBestCouponCombination,
   isCouponDisabled,
@@ -12,6 +13,7 @@ import {
   calculateShippingFee,
 } from '../payment/payment.calculator.js';
 import AppError from '../../errors/AppError.js';
+import { Coupon } from '../../model/Coupon.js';
 import { OrderItemType } from '../../model/Order.js';
 
 export default class OrderAppService {
@@ -45,11 +47,12 @@ export default class OrderAppService {
     const detail = this.getOrderDetail(id);
     const { isRemoteArea, products, orderPrice, shippingFee } = detail;
 
-    const appliedCoupons = this.couponService.getCouponsByIds(detail.coupons);
-    const discountAmount = calculateCouponsDiscount(
-      appliedCoupons,
-      this.toDiscountContext(detail),
-    );
+    const context = this.toDiscountContext(detail);
+    // 적용 시점엔 유효했어도 조회 시점에 비활성(예: 사용 시간 종료)이 된 쿠폰은 제외한다.
+    const usableCoupons = this.couponService
+      .getCouponsByIds(detail.coupons)
+      .filter((coupon) => !isCouponDisabled(coupon, context));
+    const discountAmount = calculateCouponsDiscount(usableCoupons, context);
 
     return {
       id,
@@ -93,21 +96,38 @@ export default class OrderAppService {
   }
 
   getCouponsDiscount(id: number, couponIds: number[]) {
+    const ids = Array.isArray(couponIds) ? couponIds : [];
+    const coupons = this.couponService.getCouponsByIds(ids);
     const context = this.toDiscountContext(this.getOrderDetail(id));
-    const coupons = this.couponService.getCouponsByIds(
-      Array.isArray(couponIds) ? couponIds : [],
-    );
+
+    this.validateCouponsApplicable(coupons, context);
 
     return { discountAmount: calculateCouponsDiscount(coupons, context) };
   }
 
   updateOrderCoupons(id: number, couponIds: number[]) {
     const ids = Array.isArray(couponIds) ? couponIds : [];
-    this.couponService.getCouponsByIds(ids);
+    const coupons = this.couponService.getCouponsByIds(ids);
+    const context = this.toDiscountContext(this.getOrderDetail(id));
+
+    this.validateCouponsApplicable(coupons, context);
 
     const order = this.orderService.updateCoupons(id, ids).toJson();
 
     return { id: order.id, coupons: order.coupons };
+  }
+
+  private validateCouponsApplicable(
+    coupons: Coupon[],
+    context: DiscountContext,
+  ) {
+    if (coupons.length > MAX_SELECTABLE_COUPONS) {
+      throw new AppError('COUPON_SELECTION_EXCEEDED');
+    }
+
+    if (coupons.some((coupon) => isCouponDisabled(coupon, context))) {
+      throw new AppError('COUPON_NOT_APPLICABLE');
+    }
   }
 
   private getOrderDetail(id: number) {

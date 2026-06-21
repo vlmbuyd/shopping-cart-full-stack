@@ -79,6 +79,16 @@ export const ERROR_CODE = {
     status: 404,
     message: '적용하려는 쿠폰이 존재하지 않습니다.',
   },
+  COUPON_SELECTION_EXCEEDED: {
+    code: 'COUPON_SELECTION_EXCEEDED',
+    status: 400,
+    message: '쿠폰은 최대 2개까지 선택할 수 있습니다.',
+  },
+  COUPON_NOT_APPLICABLE: {
+    code: 'COUPON_NOT_APPLICABLE',
+    status: 400,
+    message: '적용할 수 없는 쿠폰이 포함되어 있습니다.',
+  },
   INTERNAL_SERVER_ERROR: {
     code: 'INTERNAL_SERVER_ERROR',
     status: 500,
