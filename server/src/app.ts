@@ -99,6 +99,20 @@ app.get('/carts', (_, res) => {
   }
 });
 
+app.get('/carts/payment', (_, res) => {
+  try {
+    const payment = appService.getCartPayment();
+
+    res.status(200).json({
+      message: '요청에 성공했습니다.',
+      result: payment,
+    });
+  } catch (error) {
+    const { status, code, message } = errorHandler(error);
+    res.status(status).json({ code, message });
+  }
+});
+
 // 장바구니 상품 추가
 app.post('/carts/:cartItemId', (req, res) => {
   try {
@@ -131,20 +145,21 @@ app.delete('/carts/:cartItemId', (req, res) => {
   }
 });
 
-// 장바구니 상품 수량 변경
+// 장바구니 상품 선택 및 수량 변경
 app.patch('/carts/:cartItemId', (req, res) => {
   try {
     const cartItemId = Number(req.params.cartItemId);
-    const { orderCount } = req.body;
+    const { orderCount, isSelected } = req.body;
 
-    appService.updateCartItem({ id: cartItemId, orderCount });
+    const updated = appService.updateCartItem({
+      id: cartItemId,
+      orderCount,
+      isSelected,
+    });
 
     res.status(200).json({
-      message: '성공적으로 수량이 변경되었습니다.',
-      result: {
-        id: cartItemId,
-        orderCount: orderCount,
-      },
+      message: '성공적으로 변경되었습니다.',
+      result: updated,
     });
   } catch (error) {
     const { status, code, message } = errorHandler(error);
