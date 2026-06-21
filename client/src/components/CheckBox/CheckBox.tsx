@@ -5,14 +5,21 @@ import unCheckIcon from '../../assets/uncheck.svg';
 export default function CheckBox({
   isSelected,
   onSelect,
+  disabled = false,
 }: {
   isSelected: boolean;
   onSelect: (isSelected: boolean) => void;
+  disabled?: boolean;
 }) {
   const handleClick = () => onSelect(!isSelected);
-  
+
   return (
-    <Container $isSelected={isSelected} onClick={handleClick}>
+    <Container
+      type="button"
+      disabled={disabled}
+      $isSelected={isSelected}
+      onClick={handleClick}
+    >
       <IconWrapper $isSelected={isSelected}>
         {isSelected ? (
           <img src={checkIcon} alt="checkIcon" />
@@ -30,6 +37,12 @@ const Container = styled.button<{ $isSelected: boolean }>`
   border: 1px solid ${({ $isSelected }) => ($isSelected ? 'none' : '#0000001A')};
   border-radius: 8px;
   background-color: ${({ $isSelected }) => ($isSelected ? '#000' : '#fff')};
+  flex-shrink: 0;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 const IconWrapper = styled.div<{ $isSelected: boolean }>`

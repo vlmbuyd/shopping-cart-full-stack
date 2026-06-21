@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useState } from 'react';
 import OrderHeader from '../components/Order/OrderHeader';
 import { useQuery } from '../api/useQuery';
 import { getOrderList, updateOrder } from '../api/order';
@@ -6,12 +7,14 @@ import { Navigate, useParams } from 'react-router-dom';
 import OrderItemList from '../components/Order/OrderItemList';
 import RemoteAreaShippingToggle from '../components/Order/RemoteAreaShippingToggle';
 import PaymentBill, { PaymentRow } from '../components/Order/PaymentBill';
+import CouponSelectModal from '../components/Coupon/CouponSelectModal';
 import { formatPrice } from '../utils/formatPrice';
 
 export default function OrderConfirmPage() {
   const { id: orderId } = useParams();
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
-  const { data, isLoading, isSuccess, refetch } = useQuery({
+  const { data, isSuccess, refetch } = useQuery({
     queryFn: () => getOrderList(Number(orderId)),
   });
   const orders = data?.result.products ?? [];
@@ -43,7 +46,17 @@ export default function OrderConfirmPage() {
         }}
       />
       <OrderItemList orders={orders} />
-      <ApplyCouponButton>쿠폰 적용</ApplyCouponButton>
+      <ApplyCouponButton onClick={() => setIsCouponModalOpen(true)}>
+        쿠폰 적용
+      </ApplyCouponButton>
+
+      {isCouponModalOpen && (
+        <CouponSelectModal
+          orderId={data.result.id}
+          onClose={() => setIsCouponModalOpen(false)}
+          onApplied={refetch}
+        />
+      )}
 
       <RemoteAreaShippingToggle
         onToggle={handleToggleRemoteArea}
