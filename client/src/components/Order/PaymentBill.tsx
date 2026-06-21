@@ -33,7 +33,7 @@ interface PaymentRowProps {
 export function PaymentRow({ label, value }: PaymentRowProps) {
   return (
     <Row>
-      <p>{label}</p>
+      <span>{label}</span>
       <strong>{value}</strong>
     </Row>
   );
