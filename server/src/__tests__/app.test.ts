@@ -559,7 +559,7 @@ describe('GET /carts/payment API 테스트', () => {
     return id;
   };
 
-  test('선택된 상품 기준으로 주문금액·배송비·총액을 응답한다. (10만원 미만 → 배송비 3,000원)', async () => {
+  test('선택된 상품 기준으로 주문금액, 배송비, 총액을 응답한다. (10만원 미만이면 배송비 3,000원)', async () => {
     // given: 5,000원 × 2 = 10,000원
     await addProductToCart(5000, 2);
 

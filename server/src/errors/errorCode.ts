@@ -74,6 +74,11 @@ export const ERROR_CODE = {
     status: 404,
     message: '조회하려는 주문이 존재하지 않습니다.',
   },
+  COUPON_NOT_EXIST: {
+    code: 'COUPON_NOT_EXIST',
+    status: 404,
+    message: '적용하려는 쿠폰이 존재하지 않습니다.',
+  },
   INTERNAL_SERVER_ERROR: {
     code: 'INTERNAL_SERVER_ERROR',
     status: 500,
