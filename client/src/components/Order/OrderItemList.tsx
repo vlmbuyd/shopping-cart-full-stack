@@ -1,19 +1,30 @@
 import styled from '@emotion/styled';
 import ProductCard from '../Product/ProductCard';
+import type { Order } from '../../types/order.types';
 
-interface Props {}
+interface Props {
+  orders: Order[];
+}
 
-export default function OrderItemList({}: Props) {
+export default function OrderItemList({ orders }: Props) {
   return (
     <Container>
-      {cartItems.map((cartItem) => (
-        <ProductCard data={cartItem} quantity={<Quantity>2개</Quantity>} />
+      {orders.map((order) => (
+        <ProductCard
+          data={order}
+          quantity={<Quantity>{order.orderCount}개</Quantity>}
+        />
       ))}
     </Container>
   );
 }
 
-const Container = styled.div``;
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+`;
 
 const Quantity = styled.span`
   font-size: 12px;

@@ -14,4 +14,4 @@ interface CartItemType extends ProductBase {
   isSelected: boolean;
 }
 
-export type { ProductType, CartItemType };
+export type { ProductBase, ProductType, CartItemType };
