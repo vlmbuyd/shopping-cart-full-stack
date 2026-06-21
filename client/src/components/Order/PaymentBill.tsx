@@ -5,13 +5,13 @@ import { getCartPayments } from '../../api/cart';
 import { useQuery } from '../../api/useQuery';
 import Skeleton from '../Skeleton/Skeleton';
 
-export default function OrderBill() {
+export default function PaymentBill() {
   const { data, isLoading, isSuccess } = useQuery({
     queryFn: getCartPayments,
   });
 
   if (isLoading) {
-    return <OrderBillSkeleton />;
+    return <PaymentBillSkeleton />;
   }
 
   if (!isSuccess || !data) {
@@ -50,7 +50,7 @@ export default function OrderBill() {
   );
 }
 
-function OrderBillSkeleton() {
+function PaymentBillSkeleton() {
   return (
     <Container>
       <ShippingFeeInfo>
