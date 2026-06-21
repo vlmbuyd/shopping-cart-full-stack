@@ -275,4 +275,22 @@ app.post('/orders/:orderId/coupons/discount', (req, res) => {
   }
 });
 
+// 주문에 적용할 쿠폰 업데이트
+app.patch('/orders/:orderId/coupons', (req, res) => {
+  try {
+    const orderId = Number(req.params.orderId);
+    const { coupons } = req.body;
+
+    const updated = appService.updateOrderCoupons(orderId, coupons);
+
+    res.status(200).json({
+      message: '성공적으로 변경되었습니다.',
+      result: updated,
+    });
+  } catch (error) {
+    const { status, code, message } = errorHandler(error);
+    res.status(status).json({ code, message });
+  }
+});
+
 export default app;

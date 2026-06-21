@@ -112,7 +112,9 @@ export default class AppSerivce {
   }
 
   private getOrderDetail(id: number) {
-    const { orderItems, isRemoteArea } = this.orderService.getOrder(id).toJson();
+    const { orderItems, isRemoteArea, coupons } = this.orderService
+      .getOrder(id)
+      .toJson();
 
     const products = orderItems.map(({ id, orderCount }) => {
       const { name, price, imgUrl } = this.productService
@@ -125,27 +127,34 @@ export default class AppSerivce {
     const orderPrice = calculateOrderPrice(products);
     const shippingFee = calculateShippingFee(orderPrice, isRemoteArea);
 
-    return { isRemoteArea, products, orderPrice, shippingFee };
+    return { isRemoteArea, coupons, products, orderPrice, shippingFee };
   }
 
-  private buildDiscountContext(id: number): DiscountContext {
-    const { products, orderPrice, shippingFee } = this.getOrderDetail(id);
-
+  private toDiscountContext(detail: {
+    products: { price: number; orderCount: number }[];
+    orderPrice: number;
+    shippingFee: number;
+  }): DiscountContext {
     return {
-      orderItems: products.map(({ price, orderCount }) => ({
+      orderItems: detail.products.map(({ price, orderCount }) => ({
         price,
         orderCount,
       })),
-      orderPrice,
-      shippingFee,
+      orderPrice: detail.orderPrice,
+      shippingFee: detail.shippingFee,
       now: new Date(),
     };
   }
 
   getOrder(id: number) {
-    const { isRemoteArea, products, orderPrice, shippingFee } =
-      this.getOrderDetail(id);
-    const discountAmount = 0;
+    const detail = this.getOrderDetail(id);
+    const { isRemoteArea, products, orderPrice, shippingFee } = detail;
+
+    const appliedCoupons = this.couponService.getCouponsByIds(detail.coupons);
+    const discountAmount = calculateCouponsDiscount(
+      appliedCoupons,
+      this.toDiscountContext(detail),
+    );
 
     return {
       id,
@@ -161,17 +170,25 @@ export default class AppSerivce {
   }
 
   getOrderCoupons(id: number) {
-    const context = this.buildDiscountContext(id);
+    const detail = this.getOrderDetail(id);
+    const context = this.toDiscountContext(detail);
     const coupons = this.couponService.getCoupons();
-    const bestIds = new Set(
-      findBestCouponCombination(coupons, context).map((coupon) => coupon.id),
-    );
+
+    // 적용 중인 쿠폰이 있으면 그것을, 없으면 최적 조합을 선택 상태로 표시한다.
+    const selectedIds =
+      detail.coupons.length > 0
+        ? new Set(detail.coupons)
+        : new Set(
+            findBestCouponCombination(coupons, context).map(
+              (coupon) => coupon.id,
+            ),
+          );
 
     return {
       coupons: coupons.map((coupon) => ({
         id: coupon.id,
         name: coupon.name,
-        isSelected: bestIds.has(coupon.id),
+        isSelected: selectedIds.has(coupon.id),
         isDisabled: isCouponDisabled(coupon, context),
         dueDate: coupon.dueDate,
         minOrderAmount: coupon.minOrderAmount,
@@ -181,11 +198,20 @@ export default class AppSerivce {
   }
 
   getCouponsDiscount(id: number, couponIds: number[]) {
-    const context = this.buildDiscountContext(id);
+    const context = this.toDiscountContext(this.getOrderDetail(id));
     const coupons = this.couponService.getCouponsByIds(
       Array.isArray(couponIds) ? couponIds : [],
     );
 
     return { discountAmount: calculateCouponsDiscount(coupons, context) };
+  }
+
+  updateOrderCoupons(id: number, couponIds: number[]) {
+    const ids = Array.isArray(couponIds) ? couponIds : [];
+    this.couponService.getCouponsByIds(ids);
+
+    const order = this.orderService.updateCoupons(id, ids).toJson();
+
+    return { id: order.id, coupons: order.coupons };
   }
 }

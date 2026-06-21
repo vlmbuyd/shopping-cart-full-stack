@@ -10,6 +10,7 @@ export default class Order {
     private id: number,
     private orderItems: OrderItemType[],
     private isRemoteArea: boolean = false,
+    private coupons: number[] = [],
   ) {
     this.validateOrderItems();
   }
@@ -19,6 +20,7 @@ export default class Order {
       id: this.id,
       orderItems: this.orderItems,
       isRemoteArea: this.isRemoteArea,
+      coupons: this.coupons,
     };
   }
 

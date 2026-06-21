@@ -325,3 +325,100 @@ describe('POST /orders/:id/coupons/discount API 테스트', () => {
     expect(response.body.code).toBe('COUPON_NOT_EXIST');
   });
 });
+
+describe('PATCH /orders/:id/coupons API 테스트', () => {
+  beforeEach(() => {
+    products.length = 0;
+    orders.length = 0;
+  });
+
+  const createOrder = async (
+    selectedProducts: { id: number; orderCount: number }[],
+  ) => {
+    const response = await request(app)
+      .post('/orders')
+      .send({ selectedProducts });
+
+    return response.body.result.id as number;
+  };
+
+  test('선택한 쿠폰을 주문에 적용하면 200과 적용된 쿠폰 목록을 응답한다.', async () => {
+    // given
+    const productId = await addProduct(60000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+
+    // when (쿠폰 id 1 = FIXED5000)
+    const response = await request(app)
+      .patch(`/orders/${orderId}/coupons`)
+      .send({ coupons: [1] });
+
+    // then
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      message: '성공적으로 변경되었습니다.',
+      result: { id: orderId, coupons: [1] },
+    });
+  });
+
+  test('쿠폰 적용 후 주문 조회 시 결제 금액에 할인이 반영된다.', async () => {
+    // given: 60,000원 x 2 = 120,000원 (무료 배송), FIXED5000 적용 시 5,000원 할인
+    const productId = await addProduct(60000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+    await request(app).patch(`/orders/${orderId}/coupons`).send({ coupons: [1] });
+
+    // when
+    const response = await request(app).get(`/orders/${orderId}`);
+
+    // then
+    expect(response.body.result.payment).toEqual({
+      orderPrice: 120000,
+      shippingFee: 0,
+      discountAmount: 5000,
+      totalPrice: 115000,
+    });
+  });
+
+  test('쿠폰 적용 후 쿠폰 목록 조회 시 적용한 쿠폰이 isSelected로 표시된다.', async () => {
+    // given
+    const productId = await addProduct(60000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+    await request(app).patch(`/orders/${orderId}/coupons`).send({ coupons: [1] });
+
+    // when
+    const response = await request(app).get(`/orders/${orderId}/coupons`);
+
+    // then
+    const coupons = response.body.result.coupons as {
+      id: number;
+      isSelected: boolean;
+    }[];
+    expect(coupons.find((coupon) => coupon.id === 1)?.isSelected).toBe(true);
+    expect(coupons.find((coupon) => coupon.id === 2)?.isSelected).toBe(false);
+  });
+
+  test('존재하지 않는 쿠폰 적용 시 404와 COUPON_NOT_EXIST 코드를 응답한다.', async () => {
+    // given
+    const productId = await addProduct(60000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+
+    // when
+    const response = await request(app)
+      .patch(`/orders/${orderId}/coupons`)
+      .send({ coupons: [9999] });
+
+    // then
+    expect(response.status).toBe(404);
+    expect(response.body.code).toBe('COUPON_NOT_EXIST');
+  });
+
+  test('존재하지 않는 주문에 쿠폰 적용 시 404와 ORDER_NOT_EXIST 코드를 응답한다.', async () => {
+    // when
+    const response = await request(app)
+      .patch('/orders/9999/coupons')
+      .send({ coupons: [1] });
+
+    // then
+    expect(response.status).toBe(404);
+    expect(response.body.code).toBe('ORDER_NOT_EXIST');
+  });
+});

@@ -17,6 +17,10 @@ export default class OrderService {
   }
 
   updateRemoteArea(id: number, isRemoteArea: boolean) {
-    return this.orderRepository.update(id, isRemoteArea);
+    return this.orderRepository.update(id, { isRemoteArea });
+  }
+
+  updateCoupons(id: number, coupons: number[]) {
+    return this.orderRepository.update(id, { coupons });
   }
 }
