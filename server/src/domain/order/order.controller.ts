@@ -6,7 +6,7 @@ export default class OrderController {
   constructor(private orderAppService: OrderAppService) {}
 
   createOrder = (req: Request, res: Response) => {
-    const { selectedProducts } = req.body;
+    const { selectedProducts } = req.body ?? {};
 
     const id = this.orderAppService.createOrder(selectedProducts);
 
@@ -26,7 +26,7 @@ export default class OrderController {
   };
 
   updateOrder = (req: Request, res: Response) => {
-    const { isRemoteArea } = req.body;
+    const { isRemoteArea } = req.body ?? {};
 
     const updated = this.orderAppService.updateOrder({
       id: Number(req.params.orderId),
@@ -51,7 +51,7 @@ export default class OrderController {
   };
 
   getCouponsDiscount = (req: Request, res: Response) => {
-    const { coupons } = req.body;
+    const { coupons } = req.body ?? {};
 
     const discount = this.orderAppService.getCouponsDiscount(
       Number(req.params.orderId),
@@ -65,7 +65,7 @@ export default class OrderController {
   };
 
   updateOrderCoupons = (req: Request, res: Response) => {
-    const { coupons } = req.body;
+    const { coupons } = req.body ?? {};
 
     const updated = this.orderAppService.updateOrderCoupons(
       Number(req.params.orderId),
