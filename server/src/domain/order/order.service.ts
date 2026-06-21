@@ -15,4 +15,8 @@ export default class OrderService {
   getOrder(id: number) {
     return this.orderRepository.findById(id);
   }
+
+  updateRemoteArea(id: number, isRemoteArea: boolean) {
+    return this.orderRepository.update(id, isRemoteArea);
+  }
 }

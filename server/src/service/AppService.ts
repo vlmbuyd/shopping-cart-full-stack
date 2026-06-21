@@ -97,6 +97,12 @@ export default class AppSerivce {
     return this.orderService.createOrder(selectedProducts);
   }
 
+  updateOrder({ id, isRemoteArea }: { id: number; isRemoteArea: boolean }) {
+    const order = this.orderService.updateRemoteArea(id, isRemoteArea).toJson();
+
+    return { id: order.id, isRemoteArea: order.isRemoteArea };
+  }
+
   getOrder(id: number) {
     const { orderItems, isRemoteArea } = this.orderService.getOrder(id).toJson();
 
@@ -109,7 +115,7 @@ export default class AppSerivce {
     });
 
     const orderPrice = calculateOrderPrice(products);
-    const shippingFee = calculateShippingFee(orderPrice);
+    const shippingFee = calculateShippingFee(orderPrice, isRemoteArea);
     const discountAmount = 0;
 
     return {

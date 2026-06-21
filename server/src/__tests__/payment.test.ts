@@ -30,4 +30,16 @@ describe('배송비 계산 (calculateShippingFee)', () => {
   test('주문 금액이 0원이면 배송비도 0원이다.', () => {
     expect(calculateShippingFee(0)).toBe(0);
   });
+
+  test('도서 산간 지역이면 기본 배송비에 3,000원이 가산된다.', () => {
+    expect(calculateShippingFee(99999, true)).toBe(6000);
+  });
+
+  test('도서 산간 지역은 무료 배송(10만원 이상)이어도 추가 배송비가 부과된다.', () => {
+    expect(calculateShippingFee(100000, true)).toBe(3000);
+  });
+
+  test('주문 금액이 0원이면 도서 산간이어도 배송비는 0원이다.', () => {
+    expect(calculateShippingFee(0, true)).toBe(0);
+  });
 });

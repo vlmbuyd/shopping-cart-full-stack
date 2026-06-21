@@ -129,3 +129,68 @@ describe('GET /orders/:id API 테스트', () => {
     expect(response.body.code).toBe('ORDER_NOT_EXIST');
   });
 });
+
+describe('PATCH /orders/:id API 테스트', () => {
+  beforeEach(() => {
+    products.length = 0;
+    orders.length = 0;
+  });
+
+  const createOrder = async (
+    selectedProducts: { id: number; orderCount: number }[],
+  ) => {
+    const response = await request(app)
+      .post('/orders')
+      .send({ selectedProducts });
+
+    return response.body.result.id as number;
+  };
+
+  test('도서 산간 지역으로 변경하면 200과 변경된 정보를 응답한다.', async () => {
+    // given
+    const productId = await addProduct(5000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+
+    // when
+    const response = await request(app)
+      .patch(`/orders/${orderId}`)
+      .send({ isRemoteArea: true });
+
+    // then
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      message: '성공적으로 변경되었습니다.',
+      result: { id: orderId, isRemoteArea: true },
+    });
+  });
+
+  test('도서 산간 지역으로 변경 후 조회하면 배송비가 재계산된다.', async () => {
+    // given: 5,000원 × 2 = 10,000원 (기본 배송비 3,000원 + 도서 산간 3,000원)
+    const productId = await addProduct(5000);
+    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+    await request(app).patch(`/orders/${orderId}`).send({ isRemoteArea: true });
+
+    // when
+    const response = await request(app).get(`/orders/${orderId}`);
+
+    // then
+    expect(response.body.result.isRemoteArea).toBe(true);
+    expect(response.body.result.payment).toEqual({
+      orderPrice: 10000,
+      shippingFee: 6000,
+      discountAmount: 0,
+      totalPrice: 16000,
+    });
+  });
+
+  test('존재하지 않는 주문 변경 시 404와 ORDER_NOT_EXIST 코드를 응답한다.', async () => {
+    // when
+    const response = await request(app)
+      .patch('/orders/9999')
+      .send({ isRemoteArea: true });
+
+    // then
+    expect(response.status).toBe(404);
+    expect(response.body.code).toBe('ORDER_NOT_EXIST');
+  });
+});

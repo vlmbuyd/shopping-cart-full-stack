@@ -209,4 +209,22 @@ app.get('/orders/:orderId', (req, res) => {
   }
 });
 
+// 주문 정보 업데이트 (도서 산간 지역 여부)
+app.patch('/orders/:orderId', (req, res) => {
+  try {
+    const orderId = Number(req.params.orderId);
+    const { isRemoteArea } = req.body;
+
+    const updated = appService.updateOrder({ id: orderId, isRemoteArea });
+
+    res.status(200).json({
+      message: '성공적으로 변경되었습니다.',
+      result: updated,
+    });
+  } catch (error) {
+    const { status, code, message } = errorHandler(error);
+    res.status(status).json({ code, message });
+  }
+});
+
 export default app;
