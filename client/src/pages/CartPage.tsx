@@ -10,6 +10,10 @@ import { useQuery } from '../api/useQuery';
 import { useCartItemSelect } from '../hooks/useCartItemSelect';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../api/order';
+import {
+  getSelectedCartItemsCount,
+  isSelectedCartItemExist,
+} from '../utils/cart';
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -17,7 +21,6 @@ export default function CartPage() {
     queryFn: getCartList,
   });
   const cartItems = data?.result.cartItems ?? [];
-  const selectedIdsCount = cartItems.filter((item) => item.isSelected).length;
 
   const { handleSelect, handleSelectAll } = useCartItemSelect(
     cartItems,
@@ -59,13 +62,28 @@ export default function CartPage() {
   };
 
   const handleOrderConfirm = async () => {
-    // await createOrder()
-    // navigate(`navigate/${orderId}`);
+    try {
+      const selectedItems = cartItems
+        .filter((i) => i.isSelected)
+        .map((i) => ({
+          id: i.id,
+          orderCount: i.orderCount,
+        }));
+
+      const res = await createOrder(selectedItems);
+      const orderId = res.result.id;
+
+      navigate(`orders/${orderId}`);
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(err.message);
+      }
+    }
   };
 
   return (
     <Container>
-      <CartHeader totalCount={selectedIdsCount} />
+      <CartHeader totalCount={getSelectedCartItemsCount(cartItems)} />
 
       {isLoading && <CartItemListSkeleton />}
 
@@ -87,7 +105,7 @@ export default function CartPage() {
       )}
 
       <OrderConfirmButton
-        disabled={cartItems.length === 0}
+        disabled={cartItems.length === 0 || !isSelectedCartItemExist(cartItems)}
         onClick={handleOrderConfirm}
       >
         주문 확인
