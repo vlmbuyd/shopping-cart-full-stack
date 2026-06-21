@@ -18,7 +18,6 @@ export const useCartItemSelect = (
   };
 
   const handleSelectAll = async () => {
-    console.log('hi');
     const next = !isAllCartItemsSelected(cartItems);
 
     try {
