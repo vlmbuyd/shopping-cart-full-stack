@@ -3,7 +3,7 @@ import { useState } from 'react';
 import OrderHeader from '../components/Order/OrderHeader';
 import { useQuery } from '../api/useQuery';
 import { getOrderList, updateOrder } from '../api/order';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import OrderItemList from '../components/Order/OrderItemList';
 import RemoteAreaShippingToggle from '../components/Order/RemoteAreaShippingToggle';
 import PaymentBill, { PaymentRow } from '../components/Order/PaymentBill';
@@ -11,6 +11,7 @@ import CouponSelectModal from '../components/Coupon/CouponSelectModal';
 import { formatPrice } from '../utils/formatPrice';
 
 export default function OrderConfirmPage() {
+  const navigate = useNavigate();
   const { id: orderId } = useParams();
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
@@ -29,6 +30,19 @@ export default function OrderConfirmPage() {
     } catch (err) {
       if (err instanceof Error) alert(err.message);
     }
+  };
+
+  const handlePayment = () => {
+    if (!data) return;
+
+    navigate(`/payment/${orderId}`, {
+      replace: true,
+      state: {
+        type: orders.length,
+        amount: totalAmount,
+        totalPrice: data.result.payment.totalPrice,
+      },
+    });
   };
 
   if (Number.isNaN(Number(orderId))) return <Navigate to="/" replace={true} />;
@@ -84,6 +98,8 @@ export default function OrderConfirmPage() {
           value={`${formatPrice(data.result.payment.shippingFee)}원`}
         />
       </PaymentBill>
+
+      <PaymentButton onClick={handlePayment}>결제하기</PaymentButton>
     </Container>
   );
 }
@@ -104,4 +120,22 @@ const ApplyCouponButton = styled.button`
   color: #333333bf;
   background-color: #fff;
   margin-bottom: 32px;
+`;
+
+const PaymentButton = styled.button`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 430px;
+  max-width: 1280px;
+  width: 100%;
+  height: 64px;
+  background-color: #000;
+  color: #fff;
+
+  &:disabled {
+    background-color: #bebebe;
+    cursor: not-allowed;
+  }
 `;

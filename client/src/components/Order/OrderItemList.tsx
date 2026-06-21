@@ -11,6 +11,7 @@ export default function OrderItemList({ orders }: Props) {
     <Container>
       {orders.map((order) => (
         <ProductCard
+          key={order.id}
           data={order}
           quantity={<Quantity>{order.orderCount}개</Quantity>}
         />
