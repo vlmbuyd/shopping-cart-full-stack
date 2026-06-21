@@ -21,7 +21,7 @@ export default function ProductCard({ data, quantity }: Props) {
           <Price>{formatPrice(data.price)}원</Price>
         </Content>
 
-        <>{quantity}</>
+        {quantity}
       </Body>
     </Card>
   );
