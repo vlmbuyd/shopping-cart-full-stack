@@ -10,11 +10,10 @@ export const getCartList = (): Promise<APIResponse<GetCartItemListResponse>> =>
 export const deleteCartItem = (id: number): Promise<void> =>
   http.delete<void>(`/carts/${id}`);
 
+type UpdateCartItemBody = { orderCount?: number; isSelected?: boolean };
 type UpdateCartItemResponse = Pick<CartItemType, 'orderCount'>;
 export const updateCartItem = (
   id: number,
-  orderCount: number,
+  body: UpdateCartItemBody,
 ): Promise<APIResponse<UpdateCartItemResponse>> =>
-  http.patch<APIResponse<UpdateCartItemResponse>>(`/carts/${id}`, {
-    orderCount,
-  });
+  http.patch<APIResponse<UpdateCartItemResponse>>(`/carts/${id}`, body);

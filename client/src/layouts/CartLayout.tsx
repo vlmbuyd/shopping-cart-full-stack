@@ -21,7 +21,6 @@ const Container = styled.div`
   height: calc(100% - 128px);
   padding: 36px 24px 64px 24px;
   overflow: auto;
-  background-color: skyblue;
 `;
 
 const Title = styled.strong`

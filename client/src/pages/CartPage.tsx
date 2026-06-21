@@ -3,37 +3,31 @@ import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
 import CartItemListSkeleton from '../components/Cart/CartItemListSkeleton';
 import OrderBill from '../components/Order/OrderBill';
-import { saveSelectedIds } from '../utils/cartStorage';
 import { calculateOrderBill } from '../domain/calculateOrderBill';
 import { MAX_ORDER_COUNT, MIN_ORDER_COUNT } from '../domain/orderCount';
 import { deleteCartItem, getCartList, updateCartItem } from '../api/cart';
 import { useQuery } from '../api/useQuery';
 import { useCartItemSelect } from '../hooks/useCartItemSelect';
+import { useNavigate } from 'react-router-dom';
+import { createOrder } from '../api/order';
 
 export default function CartPage() {
+  const navigate = useNavigate();
   const { data, isLoading, isSuccess, refetch } = useQuery({
     queryFn: getCartList,
   });
   const cartItems = data?.result.cartItems ?? [];
+  const selectedIdsCount = cartItems.filter((item) => item.isSelected).length;
 
-  const { selectedIds, setSelectedIds, handleSelect, handleSelectAll } =
-    useCartItemSelect(cartItems.map((i) => i.id));
+  const { handleSelect, handleSelectAll } = useCartItemSelect(
+    cartItems,
+    refetch,
+  );
 
   const handleDelete = async (id: number) => {
     try {
       await deleteCartItem(id);
       refetch();
-      setSelectedIds((prev) => {
-        const next = new Set<number>(prev);
-
-        if (next.has(id)) {
-          next.delete(id);
-        }
-
-        saveSelectedIds([...next]);
-
-        return next;
-      });
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
@@ -55,7 +49,7 @@ export default function CartPage() {
     }
 
     try {
-      await updateCartItem(id, updatedOrderCount);
+      await updateCartItem(id, { orderCount: updatedOrderCount });
       refetch();
     } catch (err) {
       if (err instanceof Error) {
@@ -64,9 +58,14 @@ export default function CartPage() {
     }
   };
 
+  const handleOrderConfirm = async () => {
+    // await createOrder()
+    // navigate(`navigate/${orderId}`);
+  };
+
   return (
     <Container>
-      <CartHeader totalCount={selectedIds.size} />
+      <CartHeader totalCount={selectedIdsCount} />
 
       {isLoading && <CartItemListSkeleton />}
 
@@ -74,13 +73,12 @@ export default function CartPage() {
         <>
           <CartItemList
             cartItems={cartItems}
-            selectedIds={selectedIds}
             onSelect={handleSelect}
             onSelectAll={handleSelectAll}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
           />
-          <OrderBill orderBill={calculateOrderBill(cartItems, selectedIds)} />
+          {/* <OrderBill orderBill={calculateOrderBill(cartItems, selectedIds)} /> */}
         </>
       )}
 
@@ -88,7 +86,10 @@ export default function CartPage() {
         <EmptyItem>장바구니에 담은 상품이 없습니다.</EmptyItem>
       )}
 
-      <OrderConfirmButton disabled={cartItems.length === 0}>
+      <OrderConfirmButton
+        disabled={cartItems.length === 0}
+        onClick={handleOrderConfirm}
+      >
         주문 확인
       </OrderConfirmButton>
     </Container>

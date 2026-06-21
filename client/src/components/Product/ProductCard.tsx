@@ -5,10 +5,10 @@ import type { CartItemType } from '../../types/product.types';
 
 interface Props {
   data: CartItemType;
-  action: ReactNode;
+  quantity: ReactNode;
 }
 
-export default function ProductCard({ data, action }: Props) {
+export default function ProductCard({ data, quantity }: Props) {
   return (
     <Card>
       <ImgWrapper>
@@ -21,7 +21,7 @@ export default function ProductCard({ data, action }: Props) {
           <Price>{formatPrice(data.price)}원</Price>
         </Content>
 
-        <>{action}</>
+        <>{quantity}</>
       </Body>
     </Card>
   );
