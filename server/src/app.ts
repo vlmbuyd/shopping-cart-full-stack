@@ -17,17 +17,29 @@ import {
   InMemoryOrderRepository,
   OrderRepository,
 } from './domain/order/order.repository.js';
+import CouponService from './domain/coupon/coupon.service.js';
+import {
+  CouponRepository,
+  InMemoryCouponRepository,
+} from './domain/coupon/coupon.repository.js';
 
 function createAppService(
   productRepo: ProductRepository,
   cartRepo: CartRepository,
   orderRepo: OrderRepository,
+  couponRepo: CouponRepository,
 ) {
   const productService = new ProductService(productRepo);
   const cartService = new CartService(cartRepo);
   const orderService = new OrderService(orderRepo);
+  const couponService = new CouponService(couponRepo);
 
-  const appService = new AppService(productService, cartService, orderService);
+  const appService = new AppService(
+    productService,
+    cartService,
+    orderService,
+    couponService,
+  );
 
   return appService;
 }
@@ -36,6 +48,7 @@ const appService = createAppService(
   new InMemoryProductRepository(),
   new InMemoryCartRepository(),
   new InMemoryOrderRepository(),
+  new InMemoryCouponRepository(),
 );
 
 const app = express();
@@ -220,6 +233,41 @@ app.patch('/orders/:orderId', (req, res) => {
     res.status(200).json({
       message: '성공적으로 변경되었습니다.',
       result: updated,
+    });
+  } catch (error) {
+    const { status, code, message } = errorHandler(error);
+    res.status(status).json({ code, message });
+  }
+});
+
+// 주문에 적용 가능한 쿠폰 목록 조회
+app.get('/orders/:orderId/coupons', (req, res) => {
+  try {
+    const orderId = Number(req.params.orderId);
+
+    const coupons = appService.getOrderCoupons(orderId);
+
+    res.status(200).json({
+      message: '요청에 성공했습니다.',
+      result: coupons,
+    });
+  } catch (error) {
+    const { status, code, message } = errorHandler(error);
+    res.status(status).json({ code, message });
+  }
+});
+
+// 선택한 쿠폰 기준 할인 금액 미리보기
+app.post('/orders/:orderId/coupons/discount', (req, res) => {
+  try {
+    const orderId = Number(req.params.orderId);
+    const { coupons } = req.body;
+
+    const discount = appService.getCouponsDiscount(orderId, coupons);
+
+    res.status(200).json({
+      message: '요청에 성공했습니다.',
+      result: discount,
     });
   } catch (error) {
     const { status, code, message } = errorHandler(error);
