@@ -2,8 +2,7 @@ import styled from '@emotion/styled';
 import CartHeader from '../components/Cart/CartHeader';
 import CartItemList from '../components/Cart/CartItemList';
 import CartItemListSkeleton from '../components/Cart/CartItemListSkeleton';
-import OrderBill from '../components/Order/OrderBill';
-import { calculateOrderBill } from '../domain/calculateOrderBill';
+import CartPaymentBill from '../components/Order/CartPaymentBill';
 import { MAX_ORDER_COUNT, MIN_ORDER_COUNT } from '../domain/orderCount';
 import { deleteCartItem, getCartList, updateCartItem } from '../api/cart';
 import { useQuery } from '../api/useQuery';
@@ -73,7 +72,7 @@ export default function CartPage() {
       const res = await createOrder(selectedItems);
       const orderId = res.result.id;
 
-      navigate(`orders/${orderId}`);
+      navigate(`order/${orderId}`);
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
@@ -96,7 +95,7 @@ export default function CartPage() {
             onUpdate={handleUpdate}
             onDelete={handleDelete}
           />
-          {/* <OrderBill orderBill={calculateOrderBill(cartItems, selectedIds)} /> */}
+          <CartPaymentBill />
         </>
       )}
 

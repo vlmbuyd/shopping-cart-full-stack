@@ -1,25 +1,14 @@
 import styled from '@emotion/styled';
+import type { ReactNode } from 'react';
 import infoIcon from '../../assets/info.svg';
-import { formatPrice } from '../../utils/formatPrice';
-import { getCartPayments } from '../../api/cart';
-import { useQuery } from '../../api/useQuery';
 import Skeleton from '../Skeleton/Skeleton';
 
-export default function PaymentBill() {
-  const { data, isLoading, isSuccess } = useQuery({
-    queryFn: getCartPayments,
-  });
+interface PaymentBillProps {
+  children: ReactNode;
+  total: ReactNode;
+}
 
-  if (isLoading) {
-    return <PaymentBillSkeleton />;
-  }
-
-  if (!isSuccess || !data) {
-    return null;
-  }
-
-  const { orderPrice, shippingFee, totalPrice } = data.result;
-
+export default function PaymentBill({ children, total }: PaymentBillProps) {
   return (
     <Container>
       <ShippingFeeInfo>
@@ -29,52 +18,46 @@ export default function PaymentBill() {
         총 주문 금액이 100,000원 이상일 경우 무료 배송됩니다.
       </ShippingFeeInfo>
 
-      <OrderDetails>
-        <OrderPrice>
-          <p>주문 금액</p>
-          <strong>{formatPrice(orderPrice)}원</strong>
-        </OrderPrice>
-        <ShippingFee>
-          <p>배송비</p>
-          <strong>{formatPrice(shippingFee)}원</strong>
-        </ShippingFee>
-      </OrderDetails>
+      <Section>{children}</Section>
 
-      <OrderDetails>
-        <TotalPrice>
-          <p>총 결제 금액</p>
-          <strong>{formatPrice(totalPrice)}원</strong>
-        </TotalPrice>
-      </OrderDetails>
+      <Section>{total}</Section>
     </Container>
   );
 }
 
-function PaymentBillSkeleton() {
+interface PaymentRowProps {
+  label: ReactNode;
+  value: ReactNode;
+}
+
+export function PaymentRow({ label, value }: PaymentRowProps) {
   return (
-    <Container>
-      <ShippingFeeInfo>
-        <Skeleton width="100%" height="18px" />
-      </ShippingFeeInfo>
+    <Row>
+      <p>{label}</p>
+      <strong>{value}</strong>
+    </Row>
+  );
+}
 
-      <OrderDetails>
-        <OrderPrice>
-          <Skeleton width="80px" height="24px" />
-          <Skeleton width="120px" height="24px" />
-        </OrderPrice>
-        <ShippingFee>
-          <Skeleton width="80px" height="24px" />
-          <Skeleton width="120px" height="24px" />
-        </ShippingFee>
-      </OrderDetails>
-
-      <OrderDetails>
-        <TotalPrice>
-          <Skeleton width="100px" height="24px" />
-          <Skeleton width="140px" height="24px" />
-        </TotalPrice>
-      </OrderDetails>
-    </Container>
+export function PaymentBillSkeleton() {
+  return (
+    <PaymentBill
+      total={
+        <PaymentRow
+          label={<Skeleton width="100px" height="24px" />}
+          value={<Skeleton width="140px" height="24px" />}
+        />
+      }
+    >
+      <PaymentRow
+        label={<Skeleton width="80px" height="24px" />}
+        value={<Skeleton width="120px" height="24px" />}
+      />
+      <PaymentRow
+        label={<Skeleton width="80px" height="24px" />}
+        value={<Skeleton width="120px" height="24px" />}
+      />
+    </PaymentBill>
   );
 }
 
@@ -99,7 +82,7 @@ const IconWrapper = styled.div`
   align-items: center;
 `;
 
-const OrderDetails = styled.div`
+const Section = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -107,7 +90,7 @@ const OrderDetails = styled.div`
   border-top: 1px solid #0000001a;
 `;
 
-const PriceRow = styled.div`
+const Row = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -116,6 +99,3 @@ const PriceRow = styled.div`
   font-size: 24px;
   font-weight: 700;
 `;
-const OrderPrice = styled(PriceRow)``;
-const ShippingFee = styled(PriceRow)``;
-const TotalPrice = styled(PriceRow)``;

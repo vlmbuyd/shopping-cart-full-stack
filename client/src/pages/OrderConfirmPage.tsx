@@ -5,6 +5,8 @@ import { getOrderList, updateOrder } from '../api/order';
 import { Navigate, useParams } from 'react-router-dom';
 import OrderItemList from '../components/Order/OrderItemList';
 import RemoteAreaShippingToggle from '../components/Order/RemoteAreaShippingToggle';
+import PaymentBill, { PaymentRow } from '../components/Order/PaymentBill';
+import { formatPrice } from '../utils/formatPrice';
 
 export default function OrderConfirmPage() {
   const { id: orderId } = useParams();
@@ -47,6 +49,28 @@ export default function OrderConfirmPage() {
         onToggle={handleToggleRemoteArea}
         isSelected={data.result.isRemoteArea}
       />
+
+      <PaymentBill
+        total={
+          <PaymentRow
+            label="총 결제 금액"
+            value={`${formatPrice(data.result.payment.totalPrice)}원`}
+          />
+        }
+      >
+        <PaymentRow
+          label="주문 금액"
+          value={`${formatPrice(data.result.payment.orderPrice)}원`}
+        />
+        <PaymentRow
+          label="쿠폰 할인 금액"
+          value={`-${formatPrice(data.result.payment.discountAmount)}원`}
+        />
+        <PaymentRow
+          label="배송비"
+          value={`${formatPrice(data.result.payment.shippingFee)}원`}
+        />
+      </PaymentBill>
     </Container>
   );
 }
