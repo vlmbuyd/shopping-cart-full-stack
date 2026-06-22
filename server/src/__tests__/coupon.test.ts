@@ -53,13 +53,13 @@ describe('쿠폰 할인 금액 계산 (calculateCouponsDiscount)', () => {
     expect(calculateCouponsDiscount([FIXED5000], context())).toBe(5000);
   });
 
-  test('BOGO는 수량 2개 이상 상품 중 단가가 가장 높은 1개를 무료 처리한다.', () => {
+  test('BOGO는 수량 3개 이상 상품 중 단가가 가장 높은 1개를 무료 처리한다.', () => {
     const discount = calculateCouponsDiscount(
       [BOGO],
       context({
         orderItems: [
-          { price: 35000, orderCount: 2 },
-          { price: 25000, orderCount: 3 },
+          { price: 35000, orderCount: 3 },
+          { price: 25000, orderCount: 5 },
         ],
       }),
     );
@@ -67,10 +67,10 @@ describe('쿠폰 할인 금액 계산 (calculateCouponsDiscount)', () => {
     expect(discount).toBe(35000);
   });
 
-  test('BOGO는 수량 2개 이상인 상품이 없으면 할인이 없다.', () => {
+  test('BOGO는 수량 3개 미만 상품만 있으면 할인이 없다.', () => {
     const discount = calculateCouponsDiscount(
       [BOGO],
-      context({ orderItems: [{ price: 35000, orderCount: 1 }] }),
+      context({ orderItems: [{ price: 35000, orderCount: 2 }] }),
     );
 
     expect(discount).toBe(0);
@@ -105,7 +105,7 @@ describe('최적 쿠폰 조합 (findBestCouponCombination)', () => {
       coupons,
       context({
         orderPrice: 120000,
-        orderItems: [{ price: 60000, orderCount: 2 }],
+        orderItems: [{ price: 60000, orderCount: 3 }],
         shippingFee: 3000,
       }),
     );
@@ -121,7 +121,7 @@ describe('최적 쿠폰 조합 (findBestCouponCombination)', () => {
       coupons,
       context({
         orderPrice: 40000,
-        orderItems: [{ price: 10000, orderCount: 2 }],
+        orderItems: [{ price: 10000, orderCount: 3 }],
         now: new Date('2026-06-21T10:00:00'),
       }),
     );

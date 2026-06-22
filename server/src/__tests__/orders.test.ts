@@ -296,10 +296,10 @@ describe('POST /orders/:id/coupons/discount API 테스트', () => {
     expect(response.body.result).toEqual({ discountAmount: 5000 });
   });
 
-  test('BOGO 쿠폰 선택 시 수량 2개 이상 상품 중 단가 최고가만큼 할인한다.', async () => {
-    // given: 60,000원 상품 2개
+  test('BOGO 쿠폰 선택 시 수량 3개 이상 상품 중 단가 최고가만큼 할인한다.', async () => {
+    // given: 60,000원 상품 3개
     const productId = await addProduct(60000);
-    const orderId = await createOrder([{ id: productId, orderCount: 2 }]);
+    const orderId = await createOrder([{ id: productId, orderCount: 3 }]);
 
     // when (쿠폰 id 2 = BOGO)
     const response = await request(app)

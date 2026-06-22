@@ -43,7 +43,7 @@ function fixedDiscount(coupon: Coupon, context: DiscountContext): number {
   if (coupon.type === 'FIXED') return coupon.value;
 
   if (coupon.type === 'BOGO') {
-    const target = context.orderItems.filter((item) => item.orderCount >= 2);
+    const target = context.orderItems.filter((item) => item.orderCount >= 3);
     if (target.length === 0) return 0;
 
     return Math.max(...target.map((item) => item.price));

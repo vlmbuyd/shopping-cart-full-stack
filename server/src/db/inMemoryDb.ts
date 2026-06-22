@@ -23,7 +23,7 @@ export const coupons: Coupon[] = [
   {
     id: 2,
     code: 'BOGO',
-    name: '2개 구매 시 1개 무료 쿠폰',
+    name: '2개 구매 시 추가 1개 무료 쿠폰',
     type: 'BOGO',
     dueDate: '2026-06-30',
     minOrderAmount: 0,
