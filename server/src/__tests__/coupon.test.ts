@@ -46,6 +46,14 @@ describe('쿠폰 적용 가능 여부 (isCouponDisabled)', () => {
 
     expect(isCouponDisabled(BOGO, expired)).toBe(true);
   });
+
+  test('BOGO는 동일 상품 3개 이상인 항목이 없으면 비활성된다.', () => {
+    const notEnough = context({ orderItems: [{ price: 35000, orderCount: 2 }] });
+    const enough = context({ orderItems: [{ price: 35000, orderCount: 3 }] });
+
+    expect(isCouponDisabled(BOGO, notEnough)).toBe(true);
+    expect(isCouponDisabled(BOGO, enough)).toBe(false);
+  });
 });
 
 describe('쿠폰 할인 금액 계산 (calculateCouponsDiscount)', () => {

@@ -22,7 +22,16 @@ function formatTime(date: Date): string {
   return date.toTimeString().slice(0, 5);
 }
 
-/** 만료일, 최소주문금액, 사용시간 조건을 만족하지 못하면 true */
+// 동일 상품 2개 구매 시 추가 1개 무료 → 같은 상품을 3개 이상 담아야 적용된다.
+const BOGO_MIN_ORDER_COUNT = 3;
+
+function bogoTargets(context: DiscountContext) {
+  return context.orderItems.filter(
+    (item) => item.orderCount >= BOGO_MIN_ORDER_COUNT,
+  );
+}
+
+/** 만료일, 최소주문금액, 사용시간, (BOGO)수량 조건을 만족하지 못하면 true */
 export function isCouponDisabled(coupon: Coupon, context: DiscountContext) {
   const { now, orderPrice } = context;
 
@@ -35,6 +44,8 @@ export function isCouponDisabled(coupon: Coupon, context: DiscountContext) {
     if (current < startTime || current > endTime) return true;
   }
 
+  if (coupon.type === 'BOGO' && bogoTargets(context).length === 0) return true;
+
   return false;
 }
 
@@ -43,9 +54,10 @@ function fixedDiscount(coupon: Coupon, context: DiscountContext): number {
   if (coupon.type === 'FIXED') return coupon.value;
 
   if (coupon.type === 'BOGO') {
-    const target = context.orderItems.filter((item) => item.orderCount >= 3);
+    const target = bogoTargets(context);
     if (target.length === 0) return 0;
 
+    // 무료 대상은 단가가 가장 높은 상품 1개
     return Math.max(...target.map((item) => item.price));
   }
 
