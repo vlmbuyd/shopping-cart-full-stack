@@ -15,7 +15,7 @@ export default function OrderConfirmPage() {
   const { id: orderId } = useParams();
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
-  const { data, isSuccess, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     queryFn: () => getOrderList(Number(orderId)),
   });
   const orders = data?.result.products ?? [];
@@ -47,9 +47,7 @@ export default function OrderConfirmPage() {
 
   if (Number.isNaN(Number(orderId))) return <Navigate to="/" replace={true} />;
 
-  if (!isSuccess || !data) {
-    return null;
-  }
+  if (!data) return null;
 
   return (
     <Container>
