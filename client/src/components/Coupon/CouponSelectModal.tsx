@@ -1,15 +1,12 @@
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Modal from '../Modal';
 import CouponItem from './CouponItem';
 import infoIcon from '../../assets/info.svg';
 import { useQuery } from '../../api/useQuery';
-import {
-  getCouponsDiscount,
-  getOrderCoupons,
-  updateOrderCoupons,
-} from '../../api/coupon';
+import { getOrderCoupons, updateOrderCoupons } from '../../api/coupon';
 import { formatPrice } from '../../utils/formatPrice';
+import { useCouponDiscountPreview } from '../../hooks/useCouponDiscountPreview';
 
 const MAX_SELECTABLE_COUPONS = 2;
 
@@ -30,10 +27,14 @@ export default function CouponSelectModal({
   const coupons = data?.result.coupons ?? [];
 
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [discountAmount, setDiscountAmount] = useState(0);
   const [isApplying, setIsApplying] = useState(false);
-
   const [initializedData, setInitializedData] = useState(data);
+
+  const discountAmount = useCouponDiscountPreview({
+    orderId,
+    selectedIds,
+    enabled: !!data,
+  });
 
   if (data && data !== initializedData) {
     setInitializedData(data);
@@ -43,23 +44,6 @@ export default function CouponSelectModal({
         .map((c) => c.id),
     );
   }
-
-  useEffect(() => {
-    if (!data) return;
-
-    let cancelled = false;
-    getCouponsDiscount(orderId, selectedIds)
-      .then((res) => {
-        if (!cancelled) setDiscountAmount(res.result.discountAmount);
-      })
-      .catch(() => {
-        if (!cancelled) setDiscountAmount(0);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [orderId, selectedIds, data]);
 
   const handleToggle = (id: number) => {
     setSelectedIds((prev) => {
