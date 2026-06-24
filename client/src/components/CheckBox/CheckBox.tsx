@@ -8,17 +8,15 @@ export default function CheckBox({
   disabled = false,
 }: {
   isSelected: boolean;
-  onSelect: (isSelected: boolean) => void;
+  onSelect: () => void;
   disabled?: boolean;
 }) {
-  const handleClick = () => onSelect(!isSelected);
-
   return (
-    <Container
+    <Box
       type="button"
       disabled={disabled}
       $isSelected={isSelected}
-      onClick={handleClick}
+      onClick={onSelect}
     >
       <IconWrapper $isSelected={isSelected}>
         {isSelected ? (
@@ -27,11 +25,11 @@ export default function CheckBox({
           <img src={unCheckIcon} alt="unCheckIcon" />
         )}
       </IconWrapper>
-    </Container>
+    </Box>
   );
 }
 
-const Container = styled.button<{ $isSelected: boolean }>`
+const Box = styled.button<{ $isSelected: boolean }>`
   width: 24px;
   height: 24px;
   border: 1px solid ${({ $isSelected }) => ($isSelected ? 'none' : '#0000001A')};
