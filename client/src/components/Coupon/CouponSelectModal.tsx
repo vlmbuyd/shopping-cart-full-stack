@@ -7,8 +7,7 @@ import { useQuery } from '../../api/useQuery';
 import { getOrderCoupons, updateOrderCoupons } from '../../api/coupon';
 import { formatPrice } from '../../utils/formatPrice';
 import { useCouponDiscountPreview } from '../../hooks/useCouponDiscountPreview';
-
-const MAX_SELECTABLE_COUPONS = 2;
+import CouponSelectModalSkeleton from './CouponSelectModalSkeleton';
 
 interface CouponSelectModalProps {
   orderId: number;
@@ -24,7 +23,6 @@ export default function CouponSelectModal({
   const { data } = useQuery({
     queryFn: () => getOrderCoupons(orderId),
   });
-  const coupons = data?.result.coupons ?? [];
 
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isApplying, setIsApplying] = useState(false);
@@ -45,12 +43,22 @@ export default function CouponSelectModal({
     );
   }
 
+  if (!data) {
+    return (
+      <Modal isOpen onClose={onClose} title="쿠폰을 선택해 주세요">
+        <CouponSelectModalSkeleton />
+      </Modal>
+    );
+  }
+
+  const { coupons, maxSelectableCouponCount } = data.result;
+
   const handleToggle = (id: number) => {
     setSelectedIds((prev) => {
       if (prev.includes(id)) return prev.filter((value) => value !== id);
-      if (prev.length >= MAX_SELECTABLE_COUPONS) {
+      if (prev.length >= maxSelectableCouponCount) {
         alert(
-          `쿠폰은 최대 ${MAX_SELECTABLE_COUPONS}개까지 사용할 수 있습니다.`,
+          `쿠폰은 최대 ${maxSelectableCouponCount}개까지 사용할 수 있습니다.`,
         );
         return prev;
       }
@@ -89,7 +97,7 @@ export default function CouponSelectModal({
     >
       <InfoBanner>
         <img src={infoIcon} alt="" aria-hidden="true" />
-        쿠폰은 최대 {MAX_SELECTABLE_COUPONS}개까지 사용할 수 있습니다.
+        쿠폰은 최대 {maxSelectableCouponCount}개까지 사용할 수 있습니다.
       </InfoBanner>
 
       <List>
