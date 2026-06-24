@@ -5,6 +5,7 @@ import {
   calculateCouponsDiscount,
   findBestCouponCombination,
   isCouponDisabled,
+  isCouponSelectionExceeded,
 } from '../coupon/coupon.calculator.js';
 import OrderService from './order.service.js';
 import ProductService from '../product/product.service.js';
@@ -122,7 +123,7 @@ export default class OrderAppService {
     coupons: Coupon[],
     context: DiscountContext,
   ) {
-    if (coupons.length > MAX_SELECTABLE_COUPONS) {
+    if (isCouponSelectionExceeded(coupons)) {
       throw new AppError('COUPON_SELECTION_EXCEEDED');
     }
 

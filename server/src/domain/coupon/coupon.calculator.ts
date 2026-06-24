@@ -2,6 +2,9 @@ import { Coupon } from '../../model/Coupon.js';
 
 export const MAX_SELECTABLE_COUPONS = 2;
 
+export const isCouponSelectionExceeded = (coupons: Coupon[]) =>
+  coupons.length > MAX_SELECTABLE_COUPONS;
+
 export type DiscountContext = {
   orderItems: { price: number; orderCount: number }[];
 
