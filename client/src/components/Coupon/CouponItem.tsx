@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
 import CheckBox from '../CheckBox/CheckBox';
-import type { CouponSummary } from '../../types/coupon.types';
+import type { Coupon } from '../../types/coupon.types';
 import { formatPrice } from '../../utils/formatPrice';
 import { formatAvailableTime, formatDueDate } from '../../utils/formatCoupon';
 
 interface CouponItemProps {
-  coupon: CouponSummary;
+  coupon: Coupon;
   isSelected: boolean;
   onToggle: (id: number) => void;
 }

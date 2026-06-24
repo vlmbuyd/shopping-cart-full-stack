@@ -3,7 +3,7 @@ export interface AvailableTime {
   endTime: string;
 }
 
-export interface CouponSummary {
+export interface Coupon {
   id: number;
   name: string;
   isSelected: boolean;

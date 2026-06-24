@@ -1,10 +1,10 @@
-import type { CouponSummary } from '../types/coupon.types';
+import type { Coupon } from '../types/coupon.types';
 import { http, type APIResponse } from './api';
 
 export const getOrderCoupons = (
   orderId: number,
-): Promise<APIResponse<{ coupons: CouponSummary[] }>> =>
-  http.get<APIResponse<{ coupons: CouponSummary[] }>>(
+): Promise<APIResponse<{ coupons: Coupon[] }>> =>
+  http.get<APIResponse<{ coupons: Coupon[] }>>(
     `/orders/${orderId}/coupons`,
   );
 
