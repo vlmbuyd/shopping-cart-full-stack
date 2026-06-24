@@ -83,6 +83,7 @@ export default class OrderAppService {
           );
 
     return {
+      maxSelectableCouponCount: MAX_SELECTABLE_COUPONS,
       coupons: coupons.map((coupon) => ({
         id: coupon.id,
         name: coupon.name,
