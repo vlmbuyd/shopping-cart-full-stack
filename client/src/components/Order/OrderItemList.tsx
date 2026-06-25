@@ -13,7 +13,7 @@ export default function OrderItemList({ orders }: Props) {
         <ProductCard
           key={order.id}
           data={order}
-          quantity={<Quantity>{order.orderCount}개</Quantity>}
+          quantitySlot={<Quantity>{order.orderCount}개</Quantity>}
         />
       ))}
     </Container>

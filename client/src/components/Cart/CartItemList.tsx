@@ -40,7 +40,7 @@ export default function CartItemList({
         >
           <ProductCard
             data={cartItem}
-            quantity={
+            quantitySlot={
               <OrderCountStepper
                 orderCount={cartItem.orderCount}
                 onDecrease={() =>
