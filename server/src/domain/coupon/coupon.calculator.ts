@@ -88,11 +88,14 @@ export function calculateCouponsDiscount(
       0,
     );
 
-  const shippingSum = coupons.some((coupon) => coupon.type === 'FREE_SHIPPING')
+  const orderDiscount = Math.min(orderPrice, fixedSum + percentageSum);
+  const shippingDiscount = coupons.some(
+    (coupon) => coupon.type === 'FREE_SHIPPING',
+  )
     ? shippingFee
     : 0;
 
-  return fixedSum + percentageSum + shippingSum;
+  return orderDiscount + shippingDiscount;
 }
 
 /** 쿠폰 조합하기*/
