@@ -13,17 +13,24 @@ export const useCouponDiscountPreview = ({
   enabled,
 }: UseCouponDiscountPreviewOptions) => {
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!enabled) return;
 
     let cancelled = false;
+
+    setIsLoading(true);
     getCouponsDiscount(orderId, selectedIds)
       .then((res) => {
         if (!cancelled) setDiscountAmount(res.result.discountAmount);
       })
       .catch(() => {
-        if (!cancelled) setDiscountAmount(0);
+        if (!cancelled) setIsError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
       });
 
     return () => {
@@ -31,5 +38,5 @@ export const useCouponDiscountPreview = ({
     };
   }, [orderId, selectedIds, enabled]);
 
-  return discountAmount;
+  return { discountAmount, isLoading, isError };
 };

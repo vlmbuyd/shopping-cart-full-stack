@@ -28,7 +28,11 @@ export default function CouponSelectModal({
   const [isApplying, setIsApplying] = useState(false);
   const [initializedData, setInitializedData] = useState(data);
 
-  const discountAmount = useCouponDiscountPreview({
+  const {
+    discountAmount,
+    isLoading: isPreviewLoading,
+    isError,
+  } = useCouponDiscountPreview({
     orderId,
     selectedIds,
     enabled: !!data,
@@ -79,10 +83,14 @@ export default function CouponSelectModal({
     }
   };
 
-  const applyLabel =
-    discountAmount > 0
-      ? `총 ${formatPrice(discountAmount)}원 할인 쿠폰 사용하기`
-      : '쿠폰 적용하기';
+  const getApplyLabel = () => {
+    if (isError) return '오류가 발생했습니다';
+    if (isPreviewLoading) return '로딩 중';
+    if (discountAmount > 0)
+      return `총 ${formatPrice(discountAmount)}원 할인 쿠폰 사용하기`;
+
+    return '쿠폰 적용하기';
+  };
 
   return (
     <Modal
@@ -90,8 +98,12 @@ export default function CouponSelectModal({
       onClose={onClose}
       title="쿠폰을 선택해 주세요"
       footer={
-        <ApplyButton type="button" onClick={handleApply} disabled={isApplying}>
-          {applyLabel}
+        <ApplyButton
+          type="button"
+          onClick={handleApply}
+          disabled={isPreviewLoading || isApplying || isError}
+        >
+          {getApplyLabel()}
         </ApplyButton>
       }
     >
