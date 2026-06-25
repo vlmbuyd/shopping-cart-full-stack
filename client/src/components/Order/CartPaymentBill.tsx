@@ -19,11 +19,7 @@ export default function CartPaymentBill() {
   const { orderPrice, shippingFee, totalPrice } = data.result;
 
   return (
-    <PaymentBill
-      total={
-        <PaymentRow label="총 결제 금액" value={`${formatPrice(totalPrice)}원`} />
-      }
-    >
+    <PaymentBill totalPrice={`${formatPrice(totalPrice)}원`}>
       <PaymentRow label="주문 금액" value={`${formatPrice(orderPrice)}원`} />
       <PaymentRow label="배송비" value={`${formatPrice(shippingFee)}원`} />
     </PaymentBill>

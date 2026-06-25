@@ -4,11 +4,14 @@ import infoIcon from '../../assets/info.svg';
 import Skeleton from '../Skeleton/Skeleton';
 
 interface PaymentBillProps {
+  totalPrice?: string;
   children: ReactNode;
-  total: ReactNode;
 }
 
-export default function PaymentBill({ children, total }: PaymentBillProps) {
+export default function PaymentBill({
+  totalPrice,
+  children,
+}: PaymentBillProps) {
   return (
     <Container>
       <ShippingFeeInfo>
@@ -20,7 +23,9 @@ export default function PaymentBill({ children, total }: PaymentBillProps) {
 
       <Section>{children}</Section>
 
-      <Section>{total}</Section>
+      <Section>
+        <PaymentRow label="총 결제 금액" value={totalPrice} />
+      </Section>
     </Container>
   );
 }
@@ -41,14 +46,11 @@ export function PaymentRow({ label, value }: PaymentRowProps) {
 
 export function PaymentBillSkeleton() {
   return (
-    <PaymentBill
-      total={
-        <PaymentRow
-          label={<Skeleton width="100px" height="24px" />}
-          value={<Skeleton width="140px" height="24px" />}
-        />
-      }
-    >
+    <PaymentBill>
+      <PaymentRow
+        label={<Skeleton width="80px" height="24px" />}
+        value={<Skeleton width="120px" height="24px" />}
+      />
       <PaymentRow
         label={<Skeleton width="80px" height="24px" />}
         value={<Skeleton width="120px" height="24px" />}

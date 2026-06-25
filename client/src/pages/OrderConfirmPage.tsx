@@ -74,12 +74,7 @@ export default function OrderConfirmPage() {
       />
 
       <PaymentBill
-        total={
-          <PaymentRow
-            label="총 결제 금액"
-            value={`${formatPrice(data.result.payment.totalPrice)}원`}
-          />
-        }
+        totalPrice={`${formatPrice(data.result.payment.totalPrice)}원`}
       >
         <PaymentRow
           label="주문 금액"
