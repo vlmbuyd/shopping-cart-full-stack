@@ -38,7 +38,7 @@ export default function OrderConfirmPage() {
     navigate(`/payment/${orderId}`, {
       replace: true,
       state: {
-        type: orders.length,
+        productTypeCount: orders.length,
         totalQuantity,
         totalPrice: data.result.payment.totalPrice,
       },

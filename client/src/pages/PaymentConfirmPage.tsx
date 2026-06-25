@@ -1,17 +1,22 @@
 import styled from '@emotion/styled';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
 import { formatPrice } from '../utils/formatPrice';
 
 export default function PaymentConfirmPage() {
+  const { id: orderId } = useParams();
+
   const location = useLocation();
-  const { type, totalQuantity, totalPrice } = location.state;
+  if (!location.state) return <Navigate to={`/order/${orderId}`} replace />;
+
+  const { productTypeCount, totalQuantity, totalPrice } = location.state;
 
   return (
     <Container>
       <Content>
         <Title>결제 확인</Title>
         <Description>
-          총 {type}종류의 상품 {totalQuantity}개를 주문했습니다. <br />
+          총 {productTypeCount}종류의 상품 {totalQuantity}개를 주문했습니다.
+          <br />
           최종 결제 금액을 확인해 주세요.
         </Description>
         <TotalPrice>
