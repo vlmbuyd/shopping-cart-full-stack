@@ -4,14 +4,14 @@ import { formatPrice } from '../utils/formatPrice';
 
 export default function PaymentConfirmPage() {
   const location = useLocation();
-  const { type, amount, totalPrice } = location.state;
+  const { type, totalQuantity, totalPrice } = location.state;
 
   return (
     <Container>
       <Content>
         <Title>결제 확인</Title>
         <Description>
-          총 {type}종류의 상품 {amount}개를 주문했습니다. <br />
+          총 {type}종류의 상품 {totalQuantity}개를 주문했습니다. <br />
           최종 결제 금액을 확인해 주세요.
         </Description>
         <TotalPrice>

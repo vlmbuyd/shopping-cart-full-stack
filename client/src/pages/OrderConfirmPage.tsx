@@ -19,7 +19,7 @@ export default function OrderConfirmPage() {
     queryFn: () => getOrderList(Number(orderId)),
   });
   const orders = data?.result.products ?? [];
-  const totalAmount = orders.reduce((acc, curr) => acc + curr.orderCount, 0);
+  const totalQuantity = orders.reduce((acc, curr) => acc + curr.orderCount, 0);
 
   const handleToggleRemoteArea = async (next: boolean) => {
     try {
@@ -39,7 +39,7 @@ export default function OrderConfirmPage() {
       replace: true,
       state: {
         type: orders.length,
-        amount: totalAmount,
+        totalQuantity,
         totalPrice: data.result.payment.totalPrice,
       },
     });
@@ -52,10 +52,8 @@ export default function OrderConfirmPage() {
   return (
     <Container>
       <OrderHeader
-        count={{
-          type: orders.length,
-          amount: totalAmount,
-        }}
+        productTypeCount={orders.length}
+        totalQuantity={totalQuantity}
       />
       <OrderItemList orders={orders} />
       <ApplyCouponButton onClick={() => setIsCouponModalOpen(true)}>

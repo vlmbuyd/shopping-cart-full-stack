@@ -1,21 +1,21 @@
 import styled from '@emotion/styled';
 
 interface Props {
-  count: {
-    type: number;
-    amount: number;
-  };
+  productTypeCount: number;
+  totalQuantity: number;
 }
 
-export default function OrderHeader({ count }: Props) {
-  const { type, amount } = count;
-
+export default function OrderHeader({
+  productTypeCount,
+  totalQuantity,
+}: Props) {
   return (
     <Container>
       <Header>
         <Title>주문 확인</Title>
         <Subtitle>
-          총 {type}종류의 상품 {amount}개를 주문합니다. <br />
+          총 {productTypeCount}종류의 상품 {totalQuantity}개를 주문합니다.
+          <br />
           최종 결제 금액을 확인해 주세요.
         </Subtitle>
       </Header>
