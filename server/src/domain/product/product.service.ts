@@ -28,9 +28,7 @@ class ProductService {
   }
 
   deleteProduct(id: number) {
-    const exists = this.productRepository
-      .findAll()
-      .some((p: Product) => p.toJson().id === id);
+    const exists = this.hasProduct(id);
     if (!exists) throw new AppError('PRODUCT_NOT_EXIST');
 
     this.productRepository.delete(id);
